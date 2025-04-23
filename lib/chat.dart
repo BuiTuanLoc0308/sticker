@@ -9,6 +9,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  //* Khởi tạo displayedStickers rỗng
   List<String> displayedStickers = [];
 
   Map<String, List<String>> stickerType = {
@@ -31,26 +32,28 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
+
+    //* Mặc định displayedStickers chứa MyStickers.koala
     displayedStickers = stickerType['Koala']!;
   }
 
   @override
-  Widget build(BuildContext context) {
-    return _buildUI(context);
+  Widget build(BuildContext buildContext) {
+    return _buildUI(buildContext);
   }
 
-  Widget _buildUI(BuildContext scaffoldContext) {
+  Widget _buildUI(BuildContext buildContext) {
     return Scaffold(
-      appBar: _appBar(scaffoldContext),
-      body: _chatBody(scaffoldContext),
+      appBar: _appBar(buildContext),
+      body: _chatBody(buildContext),
     );
   }
 
-  PreferredSizeWidget? _appBar(BuildContext appBarContext) {
+  PreferredSizeWidget? _appBar(BuildContext buildContext) {
     return AppBar(
       leading: IconButton(
         onPressed: () {
-          Navigator.pop(appBarContext);
+          Navigator.pop(buildContext);
         },
         icon: const Icon(Icons.arrow_back_ios),
       ),
@@ -127,13 +130,16 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Future<T?> _openStickerPicker<T>(BuildContext rootContext) {
+  Future<T?> _openStickerPicker<T>(BuildContext chatBodyContext) {
     return showModalBottomSheet<T>(
       isScrollControlled: true,
-      context: rootContext,
+      context: chatBodyContext,
       builder: (BuildContext modalContext) {
         return StatefulBuilder(
-          builder: (BuildContext context, StateSetter modalSetState) {
+          builder: (
+            BuildContext statefulBuilderContext,
+            StateSetter modalSetState,
+          ) {
             return FractionallySizedBox(
               heightFactor: 0.5,
               child: Padding(
@@ -141,7 +147,7 @@ class _ChatPageState extends State<ChatPage> {
                   top: 20,
                   left: 20,
                   right: 20,
-                  bottom: MediaQuery.of(rootContext).size.height * 0.01,
+                  bottom: MediaQuery.of(chatBodyContext).size.height * 0.01,
                 ),
                 child: Column(
                   children: [
@@ -158,25 +164,34 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  //* Mặc định giá trị Type ban đầu là Koala
   String currentStickerTypeKey = 'Koala';
 
-  Widget _listAllSticker(StateSetter bottomSheetContext) {
+  Widget _listAllSticker(StateSetter modalSetState) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
           const Icon(Icons.favorite, size: 35),
+
+          //* stickerType.keys là Iterable<String> chứa tất cả các key (ví dụ: "Koala", "Christmas1",...)
+          //* type chính là từng phần tử trong tập keys đó
+          //* map sẽ duyệt từng type trong keys và trả về widget tương ứng cho từng cái
           ...stickerType.keys.map(
             (type) => Padding(
               padding: const EdgeInsets.only(left: 10),
               child: GestureDetector(
                 onTap: () {
-                  bottomSheetContext(() {
+                  modalSetState(() {
+                    //! print(type);
+
+                    //* Cho currentStickerTypeKey = key trong stickerType
                     currentStickerTypeKey = type;
                     displayedStickers = stickerType[type]!;
                   });
                 },
                 child: Container(
+                  //* Set chiều dài rộng cho sticker
                   width: 35,
                   height: 35,
                   color: Colors.transparent,
@@ -222,6 +237,7 @@ class _ChatPageState extends State<ChatPage> {
     return Expanded(
       child: CustomScrollView(
         slivers: [
+          //* Dùng để thêm Text trước Gridview
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 5),
@@ -231,21 +247,28 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
           ),
+
+          //* Khởi tạo Gridview
           SliverGrid(
             delegate: SliverChildBuilderDelegate((
               BuildContext gridContext,
               int index,
             ) {
               return GestureDetector(
+                //* Giữ sticker để hiện preview
                 onLongPress: () {
                   _showStickerPreview(index);
                 },
+
+                //* Click để gửi sticker
                 onTap: () {
                   setState(() {
                     chatContent.insert(0, displayedStickers[index]);
                   });
                   Navigator.of(context).pop();
                 },
+
+                //* Thả giữ sticker sẽ tự động tắt preview
                 onLongPressEnd: (details) {
                   _hideStickerPreview();
                 },
@@ -263,16 +286,21 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  //* Dùng để hiện preview cho sticker
   OverlayEntry? _previewOverlay;
 
   void _showStickerPreview(int index) {
     _previewOverlay = OverlayEntry(
-      builder: (context) {
-        final screenSize = MediaQuery.of(context).size;
-        final imageSize = screenSize.width * 0.7; // image 70% compare to screen
+      builder: (overlayEntryContext) {
+        final screenSize = MediaQuery.of(overlayEntryContext).size;
 
+        //* Độ lớn của sticker dựa theo độ lớn màn hình
+        final imageSize = screenSize.width * 0.7;
+
+        //* Chiếm toàn bộ màn hình với Positioned.fill
         return Positioned.fill(
           child: Container(
+            //* 128 là mờ 50%
             color: Colors.black.withAlpha(128),
             alignment: Alignment.center,
             child: Image.asset(
@@ -285,11 +313,15 @@ class _ChatPageState extends State<ChatPage> {
       },
     );
 
+    //* Lấy Overlay hiện tại từ context → gọi .insert() để chèn overlay vào giao diện
     Overlay.of(context).insert(_previewOverlay!);
   }
 
   void _hideStickerPreview() {
+    //* Gỡ overlay ra khỏi giao diện
     _previewOverlay?.remove();
+
+    //* Cho về null để tránh lỗi khi tạo overlay mới
     _previewOverlay = null;
   }
 }
