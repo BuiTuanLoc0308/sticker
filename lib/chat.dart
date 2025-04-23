@@ -113,9 +113,10 @@ class _ChatPageState extends State<ChatPage> {
               padding: const EdgeInsets.only(left: 10, right: 10),
               child: TextFormField(
                 focusNode: _focusNode,
+                autofocus: false,
                 onTapOutside: (event) {
                   // Tắt bàn phím khi ấn ra ngoài
-                  FocusScope.of(context).unfocus();
+                  FocusScope.of(chatBodyContext).unfocus();
                 },
                 minLines: 1,
                 maxLines: 5,
@@ -147,8 +148,11 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Future<T?> _openStickerPicker<T>(BuildContext chatBodyContext) {
-    return showModalBottomSheet<T>(
+  Future<T?> _openStickerPicker<T>(BuildContext chatBodyContext) async {
+    // Bỏ focus trước khi mở modal
+    FocusScope.of(chatBodyContext).unfocus();
+
+    final result = await showModalBottomSheet<T>(
       // Không làm mờ đằng sau modal
       barrierColor: Colors.transparent,
       // Bo tròn góc
@@ -197,6 +201,12 @@ class _ChatPageState extends State<ChatPage> {
         );
       },
     );
+    // Bỏ focus sau khi modal đóng
+    if (context.mounted) {
+      FocusScope.of(chatBodyContext).unfocus();
+    }
+
+    return result;
   }
 
   Widget _listAllSticker(StateSetter modalSetState) {
@@ -286,11 +296,11 @@ class _ChatPageState extends State<ChatPage> {
                   _showStickerPreview(index);
                 },
                 onTap: () {
+                  Navigator.of(context).pop();
                   setState(() {
                     chatContent.insert(0, displayedStickers[index]);
                   });
                   FocusScope.of(context).unfocus();
-                  Navigator.of(context).pop();
                 },
                 onLongPressEnd: (details) {
                   _hideStickerPreview();
