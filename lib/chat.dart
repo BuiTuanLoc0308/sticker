@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:my_stickers/data/models/sticker.dart';
 import 'package:my_stickers/my_stickers.dart';
 
 class ChatPage extends StatefulWidget {
@@ -10,21 +9,29 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  List<String> koalaSticker = MyStickers.koala;
-  List<String> christmasSticker = MyStickers.christmas;
-  List<Sticker> allSticker = MyStickers.allSticker;
-
   List<String> displayedStickers = [];
 
   Map<String, List<String>> stickerType = {
-    'koala': MyStickers.koala,
-    'christmas': MyStickers.christmas,
+    'Koala': MyStickers.koala,
+    'Christmas': MyStickers.christmas,
+    'Koala 1': MyStickers.koala,
+    'Christmas 1': MyStickers.christmas,
+    'Koala 2': MyStickers.koala,
+    'Christmas 2': MyStickers.christmas,
+    'Koala 3': MyStickers.koala,
+    'Christmas 3': MyStickers.christmas,
+    'Koala 4': MyStickers.koala,
+    'Christmas 4': MyStickers.christmas,
+    'Koala 5': MyStickers.koala,
+    'Christmas 5': MyStickers.christmas,
+    'Koala 6': MyStickers.koala,
+    'Christmas 6': MyStickers.christmas,
   };
 
   @override
   void initState() {
     super.initState();
-    displayedStickers = stickerType['koala']!;
+    displayedStickers = stickerType['Koala']!;
   }
 
   @override
@@ -92,24 +99,29 @@ class _ChatPageState extends State<ChatPage> {
       padding: const EdgeInsets.all(10),
       child: Row(
         children: [
+          Icon(Icons.add_circle),
           Expanded(
-            child: TextFormField(
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                border: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.black),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                hintText: 'Aa',
-                suffixIcon: GestureDetector(
-                  onTap: () {
-                    _openStickerPicker(chatBodyContext);
-                  },
-                  child: const Icon(Icons.emoji_emotions),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                  border: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.black),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  hintText: 'Aa',
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      _openStickerPicker(chatBodyContext);
+                    },
+                    child: const Icon(Icons.emoji_emotions),
+                  ),
                 ),
               ),
             ),
           ),
+          Icon(Icons.favorite),
         ],
       ),
     );
@@ -146,6 +158,8 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  String currentStickerTypeKey = 'Koala';
+
   Widget _listAllSticker(StateSetter bottomSheetContext) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -158,6 +172,7 @@ class _ChatPageState extends State<ChatPage> {
               child: GestureDetector(
                 onTap: () {
                   bottomSheetContext(() {
+                    currentStickerTypeKey = type;
                     displayedStickers = stickerType[type]!;
                   });
                 },
@@ -180,17 +195,24 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _searchBarBottomSheet() {
     return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: TextFormField(
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-          border: OutlineInputBorder(
-            borderSide: const BorderSide(color: Colors.black),
-            borderRadius: BorderRadius.circular(30),
+      padding: const EdgeInsets.only(top: 10, bottom: 10),
+      child: SizedBox(
+        height: 40,
+        child: TextFormField(
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+            border: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.black),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            hintText: 'Search stickers',
+            hintStyle: const TextStyle(color: Colors.grey),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(right: 0, left: 10),
+              child: const Icon(Icons.search),
+            ),
+            prefixIconConstraints: BoxConstraints(minWidth: 0),
           ),
-          hintText: 'Ex: koala, christmas, ...',
-          hintStyle: const TextStyle(color: Colors.grey),
-          prefixIcon: const Icon(Icons.search),
         ),
       ),
     );
@@ -198,31 +220,45 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _filteredSticker() {
     return Expanded(
-      child: GridView.builder(
-        padding: const EdgeInsets.all(8),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-        ),
-        itemCount: displayedStickers.length,
-        itemBuilder: (BuildContext gridContext, int index) {
-          return GestureDetector(
-            onLongPress: () {
-              _showStickerPreview(index);
-            },
-            onTap: () {
-              setState(() {
-                chatContent.insert(0, displayedStickers[index]);
-              });
-              Navigator.of(context).pop();
-            },
-            onLongPressEnd: (details) {
-              _hideStickerPreview();
-            },
-            child: Image.asset(displayedStickers[index]),
-          );
-        },
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Text(
+                currentStickerTypeKey,
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+          SliverGrid(
+            delegate: SliverChildBuilderDelegate((
+              BuildContext gridContext,
+              int index,
+            ) {
+              return GestureDetector(
+                onLongPress: () {
+                  _showStickerPreview(index);
+                },
+                onTap: () {
+                  setState(() {
+                    chatContent.insert(0, displayedStickers[index]);
+                  });
+                  Navigator.of(context).pop();
+                },
+                onLongPressEnd: (details) {
+                  _hideStickerPreview();
+                },
+                child: Image.asset(displayedStickers[index]),
+              );
+            }, childCount: displayedStickers.length),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 5,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
+            ),
+          ),
+        ],
       ),
     );
   }
