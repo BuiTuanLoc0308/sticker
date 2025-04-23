@@ -172,8 +172,8 @@ class _ChatPageState extends State<ChatPage> {
             ) {
               return DraggableScrollableSheet(
                 initialChildSize: 0.4,
-                maxChildSize: 0.9,
-                minChildSize: 0.1,
+                maxChildSize: 0.85,
+                minChildSize: 0.2,
                 expand: false,
                 builder: (context, scrollController) {
                   return Padding(
