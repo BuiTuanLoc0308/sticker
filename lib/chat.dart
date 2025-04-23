@@ -32,7 +32,6 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-
     //* Mặc định displayedStickers chứa MyStickers.koala
     displayedStickers = stickerType['Koala']!;
   }
@@ -97,6 +96,8 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  final FocusNode _focusNode = FocusNode();
+
   Widget _bottomChat(BuildContext chatBodyContext) {
     return Padding(
       padding: const EdgeInsets.all(10),
@@ -107,8 +108,18 @@ class _ChatPageState extends State<ChatPage> {
             child: Padding(
               padding: const EdgeInsets.only(left: 10, right: 10),
               child: TextFormField(
+                focusNode: _focusNode,
+                onTapOutside: (event) {
+                  //* Tắt bàn phím khi ấn ra ngoài
+                  FocusScope.of(context).unfocus();
+                },
+                minLines: 1,
+                maxLines: 5,
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 10,
+                  ),
                   border: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.black),
                     borderRadius: BorderRadius.circular(30),
@@ -116,6 +127,8 @@ class _ChatPageState extends State<ChatPage> {
                   hintText: 'Aa',
                   suffixIcon: GestureDetector(
                     onTap: () {
+                      //* Bỏ focus để tránh mở bàn phím
+                      _focusNode.unfocus();
                       _openStickerPicker(chatBodyContext);
                     },
                     child: const Icon(Icons.emoji_emotions),
@@ -132,33 +145,51 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<T?> _openStickerPicker<T>(BuildContext chatBodyContext) {
     return showModalBottomSheet<T>(
+      //* Không làm mờ đằng sau modal
+      barrierColor: Colors.transparent,
+      //* Bo tròn góc
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        //* Màu viền
+        side: BorderSide(color: Colors.black, width: 0.5),
+      ),
+      showDragHandle: true,
       isScrollControlled: true,
       context: chatBodyContext,
       builder: (BuildContext modalContext) {
-        return StatefulBuilder(
-          builder: (
-            BuildContext statefulBuilderContext,
-            StateSetter modalSetState,
-          ) {
-            return FractionallySizedBox(
-              heightFactor: 0.5,
-              child: Padding(
-                padding: EdgeInsets.only(
-                  top: 20,
-                  left: 20,
-                  right: 20,
-                  bottom: MediaQuery.of(chatBodyContext).size.height * 0.01,
-                ),
-                child: Column(
-                  children: [
-                    _listAllSticker(modalSetState),
-                    _searchBarBottomSheet(),
-                    _filteredSticker(),
-                  ],
-                ),
-              ),
-            );
-          },
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(modalContext).viewInsets.bottom,
+          ),
+          child: StatefulBuilder(
+            builder: (
+              BuildContext statefulBuilderContext,
+              StateSetter modalSetState,
+            ) {
+              return DraggableScrollableSheet(
+                initialChildSize: 0.5,
+                maxChildSize: 0.9,
+                minChildSize: 0.1,
+                expand: false,
+                builder: (context, scrollController) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                      bottom: MediaQuery.of(chatBodyContext).size.height * 0.01,
+                    ),
+                    child: Column(
+                      children: [
+                        _listAllSticker(modalSetState),
+                        _searchBarBottomSheet(),
+                        _filteredSticker(scrollController),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         );
       },
     );
@@ -168,42 +199,42 @@ class _ChatPageState extends State<ChatPage> {
   String currentStickerTypeKey = 'Koala';
 
   Widget _listAllSticker(StateSetter modalSetState) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          const Icon(Icons.favorite, size: 35),
-
-          //* stickerType.keys là Iterable<String> chứa tất cả các key (ví dụ: "Koala", "Christmas1",...)
-          //* type chính là từng phần tử trong tập keys đó
-          //* map sẽ duyệt từng type trong keys và trả về widget tương ứng cho từng cái
-          ...stickerType.keys.map(
-            (type) => Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: GestureDetector(
-                onTap: () {
-                  modalSetState(() {
-                    //! print(type);
-
-                    //* Cho currentStickerTypeKey = key trong stickerType
-                    currentStickerTypeKey = type;
-                    displayedStickers = stickerType[type]!;
-                  });
-                },
-                child: Container(
-                  //* Set chiều dài rộng cho sticker
-                  width: 35,
-                  height: 35,
-                  color: Colors.transparent,
-                  child: Image.asset(
-                    stickerType[type]!.first,
-                    fit: BoxFit.cover,
+    return SizedBox(
+      //* Chiều cao cố định cho SingleChildScrollView
+      height: 30,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            const Icon(Icons.favorite, size: 35),
+            //* stickerType.keys là Iterable<String> chứa tất cả các key (ví dụ: "Koala", "Christmas1",...)
+            //* type chính là từng phần tử trong tập keys đó
+            //* map sẽ duyệt từng type trong keys và trả về widget tương ứng cho từng cái
+            ...stickerType.keys.map(
+              (type) => Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    modalSetState(() {
+                      //* Cho currentStickerTypeKey = key trong stickerType
+                      currentStickerTypeKey = type;
+                      displayedStickers = stickerType[type]!;
+                    });
+                  },
+                  child: Container(
+                    width: 35,
+                    height: 35,
+                    color: Colors.transparent,
+                    child: Image.asset(
+                      stickerType[type]!.first,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -214,6 +245,9 @@ class _ChatPageState extends State<ChatPage> {
       child: SizedBox(
         height: 40,
         child: TextFormField(
+          onTapOutside: (event) {
+            FocusScope.of(context).unfocus();
+          },
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 10),
             border: OutlineInputBorder(
@@ -233,11 +267,12 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _filteredSticker() {
+  Widget _filteredSticker(ScrollController scrollController) {
     return Expanded(
       child: CustomScrollView(
+        //* Gán scrollController vào CustomScrollView
+        controller: scrollController,
         slivers: [
-          //* Dùng để thêm Text trước Gridview
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 5),
@@ -247,28 +282,18 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
           ),
-
-          //* Khởi tạo Gridview
           SliverGrid(
-            delegate: SliverChildBuilderDelegate((
-              BuildContext gridContext,
-              int index,
-            ) {
+            delegate: SliverChildBuilderDelegate((gridContext, index) {
               return GestureDetector(
-                //* Giữ sticker để hiện preview
                 onLongPress: () {
                   _showStickerPreview(index);
                 },
-
-                //* Click để gửi sticker
                 onTap: () {
                   setState(() {
                     chatContent.insert(0, displayedStickers[index]);
                   });
                   Navigator.of(context).pop();
                 },
-
-                //* Thả giữ sticker sẽ tự động tắt preview
                 onLongPressEnd: (details) {
                   _hideStickerPreview();
                 },
@@ -293,10 +318,8 @@ class _ChatPageState extends State<ChatPage> {
     _previewOverlay = OverlayEntry(
       builder: (overlayEntryContext) {
         final screenSize = MediaQuery.of(overlayEntryContext).size;
-
         //* Độ lớn của sticker dựa theo độ lớn màn hình
         final imageSize = screenSize.width * 0.7;
-
         //* Chiếm toàn bộ màn hình với Positioned.fill
         return Positioned.fill(
           child: Container(
@@ -312,7 +335,6 @@ class _ChatPageState extends State<ChatPage> {
         );
       },
     );
-
     //* Lấy Overlay hiện tại từ context → gọi .insert() để chèn overlay vào giao diện
     Overlay.of(context).insert(_previewOverlay!);
   }
@@ -320,7 +342,6 @@ class _ChatPageState extends State<ChatPage> {
   void _hideStickerPreview() {
     //* Gỡ overlay ra khỏi giao diện
     _previewOverlay?.remove();
-
     //* Cho về null để tránh lỗi khi tạo overlay mới
     _previewOverlay = null;
   }
