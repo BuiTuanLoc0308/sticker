@@ -10,38 +10,40 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  // Khởi tạo displayedStickers rỗng
+  // Để lưu và hiện lên loại sticker
   List<Sticker> displayedStickers = [];
-
+  // Để lưu và hiện lên tất cả sticker
+  Map<String, List<Sticker>> groupAllSticker = MyStickers.getStickersByType();
   // Để lưu sticker đuọc chọn gần đây
-  List<Sticker> favoriteSticker = [];
-
+  List<Sticker> recentsSticker = [];
   // Lưu nội dung sticker chat
   List<Sticker> chatContent = [];
-
   // Dùng để loại bỏ tự động mở bàn phím
   final FocusNode _focusNode = FocusNode();
-
-  // Mặc định giá trị Type ban đầu là Koala
-  String currentStickerType = 'Koala';
-
   // Dùng để chèn overlay vào giao diện
   OverlayEntry? _previewOverlay;
-
   // Lấy danh sách sticker
   List<Sticker> allStickers = MyStickers.getStickers();
-
   // Lấy danh sách thumbnail
   List<Sticker> thumbnailSticker = MyStickers.getThumbnailSticker();
 
-  // Chia sticker theo từng type
-  Map<String, List<Sticker>> getStickersByType = MyStickers.getStickersByType();
+  String currentStickerType = '';
 
   @override
   void initState() {
     super.initState();
-    // Mặc định displayedStickers chứa sticker koala
-    displayedStickers = getStickersByType['Koala'] ?? [];
+
+    currentStickerType = thumbnailSticker.first.type;
+
+    displayedStickers =
+        allStickers
+            .where((sticker) => sticker.type == currentStickerType)
+            .toList();
+
+    groupAllSticker = {
+      'Recents': recentsSticker,
+      ...MyStickers.getStickersByType(),
+    };
   }
 
   @override
@@ -87,6 +89,7 @@ class _ChatPageState extends State<ChatPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Align(
                   alignment: Alignment.centerRight,
+                  // Cố định độ lớn sticker khi gửi
                   child: SizedBox(
                     width: 100,
                     height: 100,
@@ -107,7 +110,7 @@ class _ChatPageState extends State<ChatPage> {
       padding: const EdgeInsets.all(10),
       child: Row(
         children: [
-          Icon(Icons.add_circle),
+          Icon(Icons.add_circle, size: 30),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 10, right: 10),
@@ -121,10 +124,7 @@ class _ChatPageState extends State<ChatPage> {
                 minLines: 1,
                 maxLines: 5,
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 10,
-                  ),
+                  contentPadding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
                   border: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.black),
                     borderRadius: BorderRadius.circular(30),
@@ -136,13 +136,13 @@ class _ChatPageState extends State<ChatPage> {
                       _focusNode.unfocus();
                       _openStickerPicker(chatBodyContext);
                     },
-                    child: const Icon(Icons.emoji_emotions),
+                    child: const Icon(Icons.emoji_emotions, size: 30),
                   ),
                 ),
               ),
             ),
           ),
-          Icon(Icons.favorite),
+          Icon(Icons.thumb_up, size: 30),
         ],
       ),
     );
@@ -209,7 +209,7 @@ class _ChatPageState extends State<ChatPage> {
     return result;
   }
 
-  bool isFavoriteSelected = false;
+  bool isRecentSelected = false;
 
   Widget _buildThumbnailSticker(StateSetter modalSetState) {
     return SingleChildScrollView(
@@ -219,17 +219,26 @@ class _ChatPageState extends State<ChatPage> {
           GestureDetector(
             onTap: () {
               setState(() {
-                isFavoriteSelected = true;
+                isRecentSelected = true;
               });
               modalSetState(() {
-                currentStickerType = 'Favorite Sticker';
-                displayedStickers = favoriteSticker;
+                currentStickerType = 'Recents';
+                displayedStickers = recentsSticker;
               });
             },
-            child: Icon(
-              Icons.favorite,
-              size: 35,
-              color: isFavoriteSelected ? Colors.red : Colors.black,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 0),
+              width: 45,
+              height: 45,
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color:
+                    isRecentSelected
+                        ? Colors.black.withAlpha(32)
+                        : Colors.transparent,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Icon(Icons.access_time),
             ),
           ),
           // Tạo danh sách thumbnail
@@ -249,7 +258,7 @@ class _ChatPageState extends State<ChatPage> {
         padding: const EdgeInsets.only(left: 5),
         child: GestureDetector(
           onTap: () {
-            isFavoriteSelected = false;
+            isRecentSelected = false;
             modalSetState(() {
               currentStickerType = thumbnail.type;
               displayedStickers =
@@ -264,7 +273,10 @@ class _ChatPageState extends State<ChatPage> {
             height: 45,
             padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
-              color: isThumbnailSelected ? Colors.grey : Colors.transparent,
+              color:
+                  isThumbnailSelected
+                      ? Colors.black.withAlpha(32)
+                      : Colors.transparent,
               borderRadius: BorderRadius.circular(15),
             ),
             child: Image.asset(thumbnail.path, fit: BoxFit.cover),
@@ -303,9 +315,13 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildFilteredStickerUI(ScrollController scrollController) {
+    final List<Sticker> filteredStickers =
+        (currentStickerType == 'Recents')
+            ? (groupAllSticker[currentStickerType] ?? [])
+            : displayedStickers;
+
     return Expanded(
       child: CustomScrollView(
-        // Gán scrollController vào CustomScrollView
         controller: scrollController,
         slivers: [
           SliverToBoxAdapter(
@@ -323,13 +339,14 @@ class _ChatPageState extends State<ChatPage> {
                 onTap: () {
                   Navigator.of(context).pop();
                   setState(() {
-                    Sticker selectedSticker = displayedStickers[index];
-                    // Nếu đã có trong chatContent, xóa nó
-                    favoriteSticker.removeWhere(
+                    Sticker selectedSticker = filteredStickers[index];
+                    recentsSticker.removeWhere(
                       (sticker) => sticker.path == selectedSticker.path,
                     );
-                    // Thêm lại lên đầu danh sách
-                    favoriteSticker.insert(0, selectedSticker);
+                    recentsSticker.insert(0, selectedSticker);
+                    if (recentsSticker.length > 5) {
+                      recentsSticker.removeAt(5);
+                    }
                     chatContent.insert(0, selectedSticker);
                   });
                   FocusScope.of(context).unfocus();
@@ -337,9 +354,9 @@ class _ChatPageState extends State<ChatPage> {
                 onLongPressEnd: (details) {
                   _hideStickerPreview();
                 },
-                child: Image.asset(displayedStickers[index].path),
+                child: Image.asset(filteredStickers[index].path),
               );
-            }, childCount: displayedStickers.length),
+            }, childCount: filteredStickers.length),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 5,
               crossAxisSpacing: 15,
@@ -355,7 +372,7 @@ class _ChatPageState extends State<ChatPage> {
     _previewOverlay = OverlayEntry(
       builder: (overlayEntryContext) {
         final screenSize = MediaQuery.of(overlayEntryContext).size;
-        // Độ lớn của sticker dựa theo độ lớn màn hình
+        // Độ lớn của sticker dựa theo 70% độ lớn màn hình
         final imageSize = screenSize.width * 0.7;
         // Chiếm toàn bộ màn hình với Positioned.fill
         return Positioned.fill(
