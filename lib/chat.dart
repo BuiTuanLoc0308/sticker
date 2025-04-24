@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_stickers/data/models/sticker.dart';
 import 'package:my_stickers/my_stickers.dart';
 
 class ChatPage extends StatefulWidget {
@@ -10,38 +11,34 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   // Khởi tạo displayedStickers rỗng
-  List<String> displayedStickers = [];
+  List<Sticker> displayedStickers = [];
+
   // Nội dung sticker để gửi đi
   List<String> chatContent = [];
+
   // Dùng để loại bỏ tự động mở bàn phím
   final FocusNode _focusNode = FocusNode();
+
   // Mặc định giá trị Type ban đầu là Koala
-  String currentStickerTypeKey = 'Koala';
+  String currentStickerType = 'Koala';
+
   // Dùng để chèn overlay vào giao diện
   OverlayEntry? _previewOverlay;
 
-  Map<String, List<String>> stickerType = {
-    'Koala': MyStickers.koala,
-    'Christmas': MyStickers.christmas,
-    'Koala 1': MyStickers.koala,
-    'Christmas 1': MyStickers.christmas,
-    'Koala 2': MyStickers.koala,
-    'Christmas 2': MyStickers.christmas,
-    'Koala 3': MyStickers.koala,
-    'Christmas 3': MyStickers.christmas,
-    'Koala 4': MyStickers.koala,
-    'Christmas 4': MyStickers.christmas,
-    'Koala 5': MyStickers.koala,
-    'Christmas 5': MyStickers.christmas,
-    'Koala 6': MyStickers.koala,
-    'Christmas 6': MyStickers.christmas,
-  };
+  // Lấy danh sách sticker
+  List<Sticker> allStickers = MyStickers.getStickers();
+
+  // Lấy danh sách thumbnail
+  List<Sticker> thumbnailSticker = MyStickers.getThumbnailSticker();
+
+  // Chia sticker theo từng type
+  Map<String, List<Sticker>> getStickersByType = MyStickers.getStickersByType();
 
   @override
   void initState() {
     super.initState();
-    // Mặc định displayedStickers chứa MyStickers.koala
-    displayedStickers = stickerType['Koala']!;
+    // Mặc định displayedStickers chứa sticker koala
+    displayedStickers = getStickersByType['Koala'] ?? [];
   }
 
   @override
@@ -215,32 +212,33 @@ class _ChatPageState extends State<ChatPage> {
       child: Row(
         children: [
           const Icon(Icons.favorite, size: 35),
-          // stickerType.keys là Iterable<String> chứa tất cả các key (ví dụ: "Koala", "Christmas1",...)
-          // type chính là từng phần tử trong tập keys đó
-          // map sẽ duyệt từng type trong keys và trả về widget tương ứng cho từng cái
-          ...stickerType.keys.map(
-            (type) => Padding(
+          ...List.generate(thumbnailSticker.length, (index) {
+            String type = thumbnailSticker[index].type;
+            Sticker thumbnail = thumbnailSticker[index];
+
+            return Padding(
               padding: const EdgeInsets.only(left: 10),
               child: GestureDetector(
                 onTap: () {
                   modalSetState(() {
-                    // Cho currentStickerTypeKey = key trong stickerType
-                    currentStickerTypeKey = type;
-                    displayedStickers = stickerType[type]!;
+                    currentStickerType = type;
+                    displayedStickers =
+                        MyStickers.getStickers()
+                            .where(
+                              (sticker) => sticker.type == currentStickerType,
+                            )
+                            .toList();
                   });
                 },
                 child: Container(
                   width: 35,
                   height: 35,
                   color: Colors.transparent,
-                  child: Image.asset(
-                    stickerType[type]!.first,
-                    fit: BoxFit.cover,
-                  ),
+                  child: Image.asset(thumbnail.path, fit: BoxFit.cover),
                 ),
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );
@@ -283,10 +281,7 @@ class _ChatPageState extends State<ChatPage> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 5),
-              child: Text(
-                currentStickerTypeKey,
-                style: TextStyle(fontSize: 20),
-              ),
+              child: Text(currentStickerType, style: TextStyle(fontSize: 20)),
             ),
           ),
           SliverGrid(
@@ -298,14 +293,14 @@ class _ChatPageState extends State<ChatPage> {
                 onTap: () {
                   Navigator.of(context).pop();
                   setState(() {
-                    chatContent.insert(0, displayedStickers[index]);
+                    chatContent.insert(0, displayedStickers[index].path);
                   });
                   FocusScope.of(context).unfocus();
                 },
                 onLongPressEnd: (details) {
                   _hideStickerPreview();
                 },
-                child: Image.asset(displayedStickers[index]),
+                child: Image.asset(displayedStickers[index].path),
               );
             }, childCount: displayedStickers.length),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -332,7 +327,7 @@ class _ChatPageState extends State<ChatPage> {
             color: Colors.black.withAlpha(128),
             alignment: Alignment.center,
             child: Image.asset(
-              displayedStickers[index],
+              displayedStickers[index].path,
               width: imageSize,
               height: imageSize,
             ),
