@@ -13,8 +13,11 @@ class _ChatPageState extends State<ChatPage> {
   // Khởi tạo displayedStickers rỗng
   List<Sticker> displayedStickers = [];
 
-  // Nội dung sticker để gửi đi
-  List<String> chatContent = [];
+  // Để lưu sticker đuọc chọn gần đây
+  List<Sticker> favoriteSticker = [];
+
+  // Lưu nội dung sticker chat
+  List<Sticker> chatContent = [];
 
   // Dùng để loại bỏ tự động mở bàn phím
   final FocusNode _focusNode = FocusNode();
@@ -49,7 +52,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildUI(BuildContext buildContext) {
     return Scaffold(
       appBar: _appBar(buildContext),
-      body: _chatBody(buildContext),
+      body: _buildChatBody(buildContext),
     );
   }
 
@@ -72,7 +75,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _chatBody(BuildContext chatBodyContext) {
+  Widget _buildChatBody(BuildContext chatBodyContext) {
     return Column(
       children: [
         Expanded(
@@ -87,19 +90,19 @@ class _ChatPageState extends State<ChatPage> {
                   child: SizedBox(
                     width: 100,
                     height: 100,
-                    child: Image.asset(chatContent[index]),
+                    child: Image.asset(chatContent[index].path),
                   ),
                 ),
               );
             },
           ),
         ),
-        _bottomChat(chatBodyContext),
+        _buildBottomChat(chatBodyContext),
       ],
     );
   }
 
-  Widget _bottomChat(BuildContext chatBodyContext) {
+  Widget _buildBottomChat(BuildContext chatBodyContext) {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Row(
@@ -185,9 +188,9 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     child: Column(
                       children: [
-                        _listAllSticker(modalSetState),
-                        _searchBarBottomSheet(),
-                        _filteredSticker(scrollController),
+                        _buildThumbnailSticker(modalSetState),
+                        _buildSearchStickerUI(),
+                        _buildFilteredStickerUI(scrollController),
                       ],
                     ),
                   );
@@ -206,45 +209,72 @@ class _ChatPageState extends State<ChatPage> {
     return result;
   }
 
-  Widget _listAllSticker(StateSetter modalSetState) {
+  bool isFavoriteSelected = false;
+
+  Widget _buildThumbnailSticker(StateSetter modalSetState) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          const Icon(Icons.favorite, size: 35),
-          ...List.generate(thumbnailSticker.length, (index) {
-            String type = thumbnailSticker[index].type;
-            Sticker thumbnail = thumbnailSticker[index];
-
-            return Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: GestureDetector(
-                onTap: () {
-                  modalSetState(() {
-                    currentStickerType = type;
-                    displayedStickers =
-                        MyStickers.getStickers()
-                            .where(
-                              (sticker) => sticker.type == currentStickerType,
-                            )
-                            .toList();
-                  });
-                },
-                child: Container(
-                  width: 35,
-                  height: 35,
-                  color: Colors.transparent,
-                  child: Image.asset(thumbnail.path, fit: BoxFit.cover),
-                ),
-              ),
-            );
-          }),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                isFavoriteSelected = true;
+              });
+              modalSetState(() {
+                currentStickerType = 'Favorite Sticker';
+                displayedStickers = favoriteSticker;
+              });
+            },
+            child: Icon(
+              Icons.favorite,
+              size: 35,
+              color: isFavoriteSelected ? Colors.red : Colors.black,
+            ),
+          ),
+          // Tạo danh sách thumbnail
+          ..._listThumbnailSticker(modalSetState),
         ],
       ),
     );
   }
 
-  Widget _searchBarBottomSheet() {
+  List<Widget> _listThumbnailSticker(StateSetter modalSetState) {
+    return List.generate(thumbnailSticker.length, (index) {
+      Sticker thumbnail = thumbnailSticker[index];
+      // thumbnail.type == currentStickerType ? true : false
+      bool isThumbnailSelected = thumbnail.type == currentStickerType;
+
+      return Padding(
+        padding: const EdgeInsets.only(left: 5),
+        child: GestureDetector(
+          onTap: () {
+            isFavoriteSelected = false;
+            modalSetState(() {
+              currentStickerType = thumbnail.type;
+              displayedStickers =
+                  allStickers
+                      .where((sticker) => sticker.type == thumbnail.type)
+                      .toList();
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 0),
+            width: 45,
+            height: 45,
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: isThumbnailSelected ? Colors.grey : Colors.transparent,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Image.asset(thumbnail.path, fit: BoxFit.cover),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildSearchStickerUI() {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
       child: SizedBox(
@@ -272,7 +302,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _filteredSticker(ScrollController scrollController) {
+  Widget _buildFilteredStickerUI(ScrollController scrollController) {
     return Expanded(
       child: CustomScrollView(
         // Gán scrollController vào CustomScrollView
@@ -293,7 +323,14 @@ class _ChatPageState extends State<ChatPage> {
                 onTap: () {
                   Navigator.of(context).pop();
                   setState(() {
-                    chatContent.insert(0, displayedStickers[index].path);
+                    Sticker selectedSticker = displayedStickers[index];
+                    // Nếu đã có trong chatContent, xóa nó
+                    favoriteSticker.removeWhere(
+                      (sticker) => sticker.path == selectedSticker.path,
+                    );
+                    // Thêm lại lên đầu danh sách
+                    favoriteSticker.insert(0, selectedSticker);
+                    chatContent.insert(0, selectedSticker);
                   });
                   FocusScope.of(context).unfocus();
                 },
