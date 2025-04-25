@@ -10,40 +10,29 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  // Để lưu và hiện lên loại sticker
-  List<Sticker> displayedStickers = [];
-  // Để lưu và hiện lên tất cả sticker
-  Map<String, List<Sticker>> groupAllSticker = MyStickers.getStickersByType();
-  // Để lưu sticker đuọc chọn gần đây
+  // Để lưu tất cả Sticker cùng với type của Sticker
+  Map<String, List<Sticker>> allSticker = MyStickers.getStickersByType();
+  // Để lưu Sticker đuọc chọn gần đây
   List<Sticker> recentsSticker = [];
-  // Lưu nội dung sticker chat
+  // Lưu nội dung sticker vào chat
   List<Sticker> chatContent = [];
   // Dùng để loại bỏ tự động mở bàn phím
   final FocusNode _focusNode = FocusNode();
   // Dùng để chèn overlay vào giao diện
   OverlayEntry? _previewOverlay;
-  // Lấy danh sách sticker
-  List<Sticker> allStickers = MyStickers.getStickers();
   // Lấy danh sách thumbnail
   List<Sticker> thumbnailSticker = MyStickers.getThumbnailSticker();
-
+  // Lấy type Sticker của Sticker hiện tại
   String currentStickerType = '';
 
   @override
   void initState() {
     super.initState();
-
+    // Mặc định currentStickerType ban đầu-
+    // -là type của sticker vị trí đầu trong thumbnail
     currentStickerType = thumbnailSticker.first.type;
-
-    displayedStickers =
-        allStickers
-            .where((sticker) => sticker.type == currentStickerType)
-            .toList();
-
-    groupAllSticker = {
-      'Recents': recentsSticker,
-      ...MyStickers.getStickersByType(),
-    };
+    // Đưa Recents và các Sticker của Recents vào allSticker
+    allSticker = {'Recents': recentsSticker, ...MyStickers.getStickersByType()};
   }
 
   @override
@@ -91,8 +80,9 @@ class _ChatPageState extends State<ChatPage> {
                   alignment: Alignment.centerRight,
                   // Cố định độ lớn sticker khi gửi
                   child: SizedBox(
-                    width: 100,
-                    height: 100,
+                    // Độ lớn dựa theo % độ lớn màn hình
+                    width: MediaQuery.of(context).size.width * 0.2,
+                    height: MediaQuery.of(context).size.width * 0.2,
                     child: Image.asset(chatContent[index].path),
                   ),
                 ),
@@ -132,7 +122,7 @@ class _ChatPageState extends State<ChatPage> {
                   hintText: 'Aa',
                   suffixIcon: GestureDetector(
                     onTap: () {
-                      // Bỏ focus để tránh mở bàn phím
+                      // Tránh tự động mở bàn phím
                       _focusNode.unfocus();
                       _openStickerPicker(chatBodyContext);
                     },
@@ -167,6 +157,7 @@ class _ChatPageState extends State<ChatPage> {
       builder: (BuildContext modalContext) {
         return Padding(
           padding: EdgeInsets.only(
+            // Trả về chiều cao của phần bị che bởi bàn phím
             bottom: MediaQuery.of(modalContext).viewInsets.bottom,
           ),
           child: StatefulBuilder(
@@ -175,8 +166,11 @@ class _ChatPageState extends State<ChatPage> {
               StateSetter modalSetState,
             ) {
               return DraggableScrollableSheet(
+                // Khi mở cố định tại 40% màn hình
                 initialChildSize: 0.4,
+                // Kéo lên tối đa 85%
                 maxChildSize: 0.85,
+                // Kéo xuống tối đa 20%
                 minChildSize: 0.2,
                 expand: false,
                 builder: (context, scrollController) {
@@ -184,6 +178,7 @@ class _ChatPageState extends State<ChatPage> {
                     padding: EdgeInsets.only(
                       left: 20,
                       right: 20,
+                      // Cách màn hình 1%
                       bottom: MediaQuery.of(chatBodyContext).size.height * 0.01,
                     ),
                     child: Column(
@@ -201,7 +196,7 @@ class _ChatPageState extends State<ChatPage> {
         );
       },
     );
-    // Bỏ focus sau khi modal đóng
+    // Tránh tự động mở chat sau khi tắt modal
     if (context.mounted) {
       FocusScope.of(chatBodyContext).unfocus();
     }
@@ -216,34 +211,38 @@ class _ChatPageState extends State<ChatPage> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                isRecentSelected = true;
-              });
-              modalSetState(() {
-                currentStickerType = 'Recents';
-                displayedStickers = recentsSticker;
-              });
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 0),
-              width: 45,
-              height: 45,
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                color:
-                    isRecentSelected
-                        ? Colors.black.withAlpha(32)
-                        : Colors.transparent,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Icon(Icons.access_time),
-            ),
-          ),
-          // Tạo danh sách thumbnail
+          // Tạo thumbnail cho Recents Sticker
+          _recentThumbnailSticker(modalSetState),
+          // Tạo danh sách thumbnail cho các Sticker
           ..._listThumbnailSticker(modalSetState),
         ],
+      ),
+    );
+  }
+
+  Widget _recentThumbnailSticker(StateSetter modalSetState) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          isRecentSelected = true;
+        });
+        modalSetState(() {
+          currentStickerType = 'Recents';
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 0),
+        width: 45,
+        height: 45,
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color:
+              isRecentSelected
+                  ? Colors.black.withAlpha(32)
+                  : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Icon(Icons.access_time),
       ),
     );
   }
@@ -251,7 +250,7 @@ class _ChatPageState extends State<ChatPage> {
   List<Widget> _listThumbnailSticker(StateSetter modalSetState) {
     return List.generate(thumbnailSticker.length, (index) {
       Sticker thumbnail = thumbnailSticker[index];
-      // thumbnail.type == currentStickerType ? true : false
+      // thumbnail.type == currentStickerType ? isThumbnailSelected = true : false
       bool isThumbnailSelected = thumbnail.type == currentStickerType;
 
       return Padding(
@@ -261,10 +260,6 @@ class _ChatPageState extends State<ChatPage> {
             isRecentSelected = false;
             modalSetState(() {
               currentStickerType = thumbnail.type;
-              displayedStickers =
-                  allStickers
-                      .where((sticker) => sticker.type == thumbnail.type)
-                      .toList();
             });
           },
           child: AnimatedContainer(
@@ -315,65 +310,95 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildFilteredStickerUI(ScrollController scrollController) {
-    final List<Sticker> filteredStickers =
+    final Map<String, List<Sticker>> filteredStickers =
         (currentStickerType == 'Recents')
-            ? (groupAllSticker[currentStickerType] ?? [])
-            : displayedStickers;
+            // Chỉ lấy 5 loại Sticker để hiện ở phần Recents
+            ? Map.fromEntries(allSticker.entries.take(5))
+            // Chỉ lấy 1 loại Sticker theo currentStickerType
+            : {currentStickerType: allSticker[currentStickerType] ?? []};
 
     return Expanded(
       child: CustomScrollView(
         controller: scrollController,
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Text(currentStickerType, style: TextStyle(fontSize: 20)),
-            ),
-          ),
-          SliverGrid(
-            delegate: SliverChildBuilderDelegate((gridContext, index) {
-              return GestureDetector(
-                onLongPress: () {
-                  _showStickerPreview(index);
-                },
-                onTap: () {
-                  Navigator.of(context).pop();
-                  setState(() {
-                    Sticker selectedSticker = filteredStickers[index];
-                    recentsSticker.removeWhere(
-                      (sticker) => sticker.path == selectedSticker.path,
-                    );
-                    recentsSticker.insert(0, selectedSticker);
-                    if (recentsSticker.length > 5) {
-                      recentsSticker.removeAt(5);
-                    }
-                    chatContent.insert(0, selectedSticker);
-                  });
-                  FocusScope.of(context).unfocus();
-                },
-                onLongPressEnd: (details) {
-                  _hideStickerPreview();
-                },
-                child: Image.asset(filteredStickers[index].path),
-              );
-            }, childCount: filteredStickers.length),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 5,
-              crossAxisSpacing: 15,
-              mainAxisSpacing: 15,
-            ),
-          ),
-        ],
+        slivers:
+            // Duyệt qua từng entry
+            filteredStickers.entries.expand((entry) {
+              // Gọi hàm lấy key là loại Sticker
+              final String stickerType = entry.key;
+              // Gọi hàm lấy value là các Sticker và chỉ lấy 10 Sticker
+              final List<Sticker> stickers =
+                  (currentStickerType == 'Recents')
+                      ? entry.value.take(10).toList()
+                      : entry.value;
+
+              return [
+                // Hiện loại Sticker trên đầu list
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Text(
+                      stickerType,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                  ),
+                ),
+                // Tạo list Sticker
+                stickers.isNotEmpty
+                    ? SliverGrid(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final sticker = stickers[index];
+                        return GestureDetector(
+                          onLongPress: () => _showStickerPreview(sticker),
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            // Nếu Sticker đã có trong Recents, xóa Sticker
+                            setState(() {
+                              recentsSticker.removeWhere(
+                                (s) => s.path == sticker.path,
+                              );
+                              // Thêm lại Sticker vào đầu danh sách
+                              recentsSticker.insert(0, sticker);
+                              // Chỉ hiển thị 5 Sticker
+                              if (recentsSticker.length > 5) {
+                                recentsSticker.removeAt(5);
+                              }
+                              // Thêm Sticker mới chọn vào chat
+                              chatContent.insert(0, sticker);
+                            });
+                            FocusScope.of(context).unfocus();
+                          },
+                          onLongPressEnd: (_) => _hideStickerPreview(),
+                          child: Image.asset(sticker.path),
+                        );
+                      }, childCount: stickers.length),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
+                    )
+                    : SliverToBoxAdapter(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withAlpha(32),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Icon(Icons.access_time, size: 40),
+                        ),
+                      ),
+                    ),
+              ];
+            }).toList(),
       ),
     );
   }
 
-  void _showStickerPreview(int index) {
+  void _showStickerPreview(Sticker sticker) {
     _previewOverlay = OverlayEntry(
       builder: (overlayEntryContext) {
-        final screenSize = MediaQuery.of(overlayEntryContext).size;
-        // Độ lớn của sticker dựa theo 70% độ lớn màn hình
-        final imageSize = screenSize.width * 0.7;
         // Chiếm toàn bộ màn hình với Positioned.fill
         return Positioned.fill(
           child: Container(
@@ -381,9 +406,9 @@ class _ChatPageState extends State<ChatPage> {
             color: Colors.black.withAlpha(128),
             alignment: Alignment.center,
             child: Image.asset(
-              displayedStickers[index].path,
-              width: imageSize,
-              height: imageSize,
+              sticker.path,
+              width: MediaQuery.of(overlayEntryContext).size.width * 0.7,
+              height: MediaQuery.of(overlayEntryContext).size.width * 0.7,
             ),
           ),
         );
