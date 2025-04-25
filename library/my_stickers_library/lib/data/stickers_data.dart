@@ -4,7 +4,7 @@ import 'package:my_stickers/data/models/sticker.dart';
 class MyStickers {
   static final List<Sticker> _allSticker = [
     ...List.generate(
-        30,
+        20,
         (_) => [
               Sticker(
                   path: 'packages/my_stickers/assets/koala/koala_birthday.png',
@@ -41,6 +41,30 @@ class MyStickers {
     Sticker(
       path: 'packages/my_stickers/assets/koala/koala_birthday.png',
       type: 'Koala',
+    ),
+    Sticker(
+      path: 'packages/my_stickers/assets/love/love_birds.png',
+      type: 'Love 1',
+    ),
+    Sticker(
+      path: 'packages/my_stickers/assets/christmas/mr_christmas.png',
+      type: 'Christmas 1',
+    ),
+    Sticker(
+      path: 'packages/my_stickers/assets/koala/koala_birthday.png',
+      type: 'Koala 1',
+    ),
+    Sticker(
+      path: 'packages/my_stickers/assets/love/love_birds.png',
+      type: 'Love 2',
+    ),
+    Sticker(
+      path: 'packages/my_stickers/assets/christmas/mr_christmas.png',
+      type: 'Christmas 2',
+    ),
+    Sticker(
+      path: 'packages/my_stickers/assets/koala/koala_birthday.png',
+      type: 'Koala 2',
     ),
   ];
 

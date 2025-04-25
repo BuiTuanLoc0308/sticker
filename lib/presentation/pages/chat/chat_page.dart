@@ -78,11 +78,10 @@ class _ChatPageState extends State<ChatPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Align(
                   alignment: Alignment.centerRight,
-                  // Cố định độ lớn sticker khi gửi
                   child: SizedBox(
                     // Độ lớn dựa theo % độ lớn màn hình
-                    width: MediaQuery.of(context).size.width * 0.2,
-                    height: MediaQuery.of(context).size.width * 0.2,
+                    width: MediaQuery.of(context).size.width * 0.25,
+                    height: MediaQuery.of(context).size.width * 0.25,
                     child: Image.asset(chatContent[index].path),
                   ),
                 ),
@@ -139,7 +138,6 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<T?> _openStickerPicker<T>(BuildContext chatBodyContext) async {
-    // Bỏ focus trước khi mở modal
     FocusScope.of(chatBodyContext).unfocus();
 
     final result = await showModalBottomSheet<T>(
@@ -183,7 +181,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     child: Column(
                       children: [
-                        _buildThumbnailSticker(modalSetState),
+                        _buildThumbnailSticker(modalSetState, scrollController),
                         _buildSearchStickerUI(),
                         _buildFilteredStickerUI(scrollController),
                       ],
@@ -206,21 +204,27 @@ class _ChatPageState extends State<ChatPage> {
 
   bool isRecentSelected = false;
 
-  Widget _buildThumbnailSticker(StateSetter modalSetState) {
+  Widget _buildThumbnailSticker(
+    StateSetter modalSetState,
+    ScrollController scrollController,
+  ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
           // Tạo thumbnail cho Recents Sticker
-          _recentThumbnailSticker(modalSetState),
+          _recentThumbnailSticker(modalSetState, scrollController),
           // Tạo danh sách thumbnail cho các Sticker
-          ..._listThumbnailSticker(modalSetState),
+          ..._listThumbnailSticker(modalSetState, scrollController),
         ],
       ),
     );
   }
 
-  Widget _recentThumbnailSticker(StateSetter modalSetState) {
+  Widget _recentThumbnailSticker(
+    StateSetter modalSetState,
+    ScrollController scrollController,
+  ) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -228,6 +232,7 @@ class _ChatPageState extends State<ChatPage> {
         });
         modalSetState(() {
           currentStickerType = 'Recents';
+          scrollController.jumpTo(0);
         });
       },
       child: AnimatedContainer(
@@ -247,7 +252,10 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  List<Widget> _listThumbnailSticker(StateSetter modalSetState) {
+  List<Widget> _listThumbnailSticker(
+    StateSetter modalSetState,
+    ScrollController scrollController,
+  ) {
     return List.generate(thumbnailSticker.length, (index) {
       Sticker thumbnail = thumbnailSticker[index];
       // thumbnail.type == currentStickerType ? isThumbnailSelected = true : false
@@ -260,6 +268,7 @@ class _ChatPageState extends State<ChatPage> {
             isRecentSelected = false;
             modalSetState(() {
               currentStickerType = thumbnail.type;
+              scrollController.jumpTo(0);
             });
           },
           child: AnimatedContainer(
@@ -342,7 +351,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 ),
-                // Tạo list Sticker
+                // Tạo list Sticker nếu có Sticker
                 stickers.isNotEmpty
                     ? SliverGrid(
                       delegate: SliverChildBuilderDelegate((context, index) {
@@ -378,16 +387,11 @@ class _ChatPageState extends State<ChatPage> {
                             mainAxisSpacing: 10,
                           ),
                     )
+                    // Nếu loại Sticker đó rỗng trả về 1 icon
                     : SliverToBoxAdapter(
                       child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black.withAlpha(32),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Icon(Icons.access_time, size: 40),
-                        ),
+                        child: Icon(Icons.add_link, size: 40),
                       ),
                     ),
               ];
