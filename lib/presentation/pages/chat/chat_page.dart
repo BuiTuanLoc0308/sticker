@@ -42,12 +42,12 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildUI(BuildContext buildContext) {
     return Scaffold(
-      appBar: _appBar(buildContext),
-      body: _buildChatBody(buildContext),
+      appBar: _buildAppBarUI(buildContext),
+      body: _buildChatBodyUI(buildContext),
     );
   }
 
-  PreferredSizeWidget? _appBar(BuildContext buildContext) {
+  PreferredSizeWidget? _buildAppBarUI(BuildContext buildContext) {
     return AppBar(
       leading: IconButton(
         onPressed: () {
@@ -66,35 +66,37 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _buildChatBody(BuildContext chatBodyContext) {
+  Widget _buildChatBodyUI(BuildContext chatBodyContext) {
     return Column(
       children: [
-        Expanded(
-          child: ListView.builder(
-            reverse: true,
-            itemCount: chatContent.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: SizedBox(
-                    // Độ lớn dựa theo % độ lớn màn hình
-                    width: MediaQuery.of(context).size.width * 0.25,
-                    height: MediaQuery.of(context).size.width * 0.25,
-                    child: Image.asset(chatContent[index].path),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        _buildBottomChat(chatBodyContext),
+        Expanded(child: _chatContentList()),
+        _buildBottomChatUI(chatBodyContext),
       ],
     );
   }
 
-  Widget _buildBottomChat(BuildContext chatBodyContext) {
+  Widget _chatContentList() {
+    return ListView.builder(
+      reverse: true,
+      itemCount: chatContent.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              // Độ lớn dựa theo % độ lớn màn hình
+              width: MediaQuery.of(context).size.width * 0.25,
+              height: MediaQuery.of(context).size.width * 0.25,
+              child: Image.asset(chatContent[index].path),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBottomChatUI(BuildContext chatBodyContext) {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Row(
@@ -103,32 +105,7 @@ class _ChatPageState extends State<ChatPage> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 10, right: 10),
-              child: TextFormField(
-                focusNode: _focusNode,
-                autofocus: false,
-                onTapOutside: (event) {
-                  // Tắt bàn phím khi ấn ra ngoài
-                  FocusScope.of(chatBodyContext).unfocus();
-                },
-                minLines: 1,
-                maxLines: 5,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-                  border: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.black),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  hintText: 'Aa',
-                  suffixIcon: GestureDetector(
-                    onTap: () {
-                      // Tránh tự động mở bàn phím
-                      _focusNode.unfocus();
-                      _openStickerPicker(chatBodyContext);
-                    },
-                    child: const Icon(Icons.emoji_emotions, size: 30),
-                  ),
-                ),
-              ),
+              child: _textInputField(chatBodyContext),
             ),
           ),
           Icon(Icons.thumb_up, size: 30),
@@ -137,7 +114,36 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Future<T?> _openStickerPicker<T>(BuildContext chatBodyContext) async {
+  Widget _textInputField(BuildContext chatBodyContext) {
+    return TextFormField(
+      focusNode: _focusNode,
+      autofocus: false,
+      onTapOutside: (event) {
+        // Tắt bàn phím khi ấn ra ngoài
+        FocusScope.of(chatBodyContext).unfocus();
+      },
+      minLines: 1,
+      maxLines: 5,
+      decoration: InputDecoration(
+        contentPadding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.black),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        hintText: 'Aa',
+        suffixIcon: GestureDetector(
+          onTap: () {
+            // Tránh tự động mở bàn phím
+            _focusNode.unfocus();
+            _buildStickerPickerUI(chatBodyContext);
+          },
+          child: const Icon(Icons.emoji_emotions, size: 30),
+        ),
+      ),
+    );
+  }
+
+  Future<T?> _buildStickerPickerUI<T>(BuildContext chatBodyContext) async {
     FocusScope.of(chatBodyContext).unfocus();
 
     final result = await showModalBottomSheet<T>(
@@ -215,7 +221,7 @@ class _ChatPageState extends State<ChatPage> {
           // Tạo thumbnail cho Recents Sticker
           _recentThumbnailSticker(modalSetState, scrollController),
           // Tạo danh sách thumbnail cho các Sticker
-          ..._listThumbnailSticker(modalSetState, scrollController),
+          ..._thumbnailStickerList(modalSetState, scrollController),
         ],
       ),
     );
@@ -252,7 +258,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  List<Widget> _listThumbnailSticker(
+  List<Widget> _thumbnailStickerList(
     StateSetter modalSetState,
     ScrollController scrollController,
   ) {
@@ -330,14 +336,14 @@ class _ChatPageState extends State<ChatPage> {
       child: CustomScrollView(
         controller: scrollController,
         slivers:
-            // Duyệt qua từng entry
+            // Duyệt qua từng phần tử
             filteredStickers.entries.expand((entry) {
               // Gọi hàm lấy key là loại Sticker
               final String stickerType = entry.key;
-              // Gọi hàm lấy value là các Sticker và chỉ lấy 10 Sticker
+              // Gọi hàm lấy value là các Sticker và chỉ lấy đủ số Sticker
               final List<Sticker> stickers =
                   (currentStickerType == 'Recents')
-                      ? entry.value.take(10).toList()
+                      ? entry.value.take(5).toList()
                       : entry.value;
 
               return [
@@ -353,41 +359,8 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 // Tạo list Sticker nếu có Sticker
                 stickers.isNotEmpty
-                    ? SliverGrid(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final sticker = stickers[index];
-                        return GestureDetector(
-                          onLongPress: () => _showStickerPreview(sticker),
-                          onTap: () {
-                            Navigator.of(context).pop();
-                            // Nếu Sticker đã có trong Recents, xóa Sticker
-                            setState(() {
-                              recentsSticker.removeWhere(
-                                (s) => s.path == sticker.path,
-                              );
-                              // Thêm lại Sticker vào đầu danh sách
-                              recentsSticker.insert(0, sticker);
-                              // Chỉ hiển thị 5 Sticker
-                              if (recentsSticker.length > 5) {
-                                recentsSticker.removeAt(5);
-                              }
-                              // Thêm Sticker mới chọn vào chat
-                              chatContent.insert(0, sticker);
-                            });
-                            FocusScope.of(context).unfocus();
-                          },
-                          onLongPressEnd: (_) => _hideStickerPreview(),
-                          child: Image.asset(sticker.path),
-                        );
-                      }, childCount: stickers.length),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                          ),
-                    )
-                    // Nếu loại Sticker đó rỗng trả về 1 icon
+                    ? _filteredStickerList(stickers)
+                    // Nếu loại Sticker đó rỗng thì trả về:
                     : SliverToBoxAdapter(
                       child: Align(
                         alignment: Alignment.centerLeft,
@@ -396,6 +369,40 @@ class _ChatPageState extends State<ChatPage> {
                     ),
               ];
             }).toList(),
+      ),
+    );
+  }
+
+  Widget _filteredStickerList(List<Sticker> stickers) {
+    return SliverGrid(
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final sticker = stickers[index];
+        return GestureDetector(
+          onLongPress: () => _showStickerPreview(sticker),
+          onTap: () {
+            Navigator.of(context).pop();
+            // Nếu Sticker đã có trong Recents, xóa Sticker
+            setState(() {
+              recentsSticker.removeWhere((s) => s.path == sticker.path);
+              // Thêm lại Sticker vào đầu danh sách
+              recentsSticker.insert(0, sticker);
+              // Chỉ hiển thị 5 Sticker
+              if (recentsSticker.length > 5) {
+                recentsSticker.removeAt(5);
+              }
+              // Thêm Sticker mới chọn vào chat
+              chatContent.insert(0, sticker);
+            });
+            FocusScope.of(context).unfocus();
+          },
+          onLongPressEnd: (_) => _hideStickerPreview(),
+          child: Image.asset(sticker.path),
+        );
+      }, childCount: stickers.length),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 5,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
       ),
     );
   }
