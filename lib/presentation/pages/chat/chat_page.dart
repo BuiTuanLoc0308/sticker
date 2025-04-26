@@ -21,7 +21,8 @@ class _ChatPageState extends State<ChatPage> {
   // Dùng để chèn overlay vào giao diện
   OverlayEntry? _previewOverlay;
   // Lấy danh sách thumbnail
-  List<Sticker> thumbnailSticker = MyStickers.getThumbnailSticker();
+  List<Sticker> thumbnailSticker =
+      MyStickers.getThumbnailSticker().take(10).toList();
   // Lấy type Sticker của Sticker hiện tại
   String currentStickerType = '';
 
@@ -189,7 +190,10 @@ class _ChatPageState extends State<ChatPage> {
                       children: [
                         _buildThumbnailSticker(modalSetState, scrollController),
                         _buildSearchStickerUI(),
-                        _buildFilteredStickerUI(scrollController),
+                        _buildFilteredStickerUI(
+                          scrollController,
+                          modalSetState,
+                        ),
                       ],
                     ),
                   );
@@ -262,6 +266,7 @@ class _ChatPageState extends State<ChatPage> {
     StateSetter modalSetState,
     ScrollController scrollController,
   ) {
+    // Chỉ lấy 10 thumbnail hiện lên giao diện
     return List.generate(thumbnailSticker.length, (index) {
       Sticker thumbnail = thumbnailSticker[index];
       // thumbnail.type == currentStickerType ? isThumbnailSelected = true : false
@@ -324,7 +329,10 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _buildFilteredStickerUI(ScrollController scrollController) {
+  Widget _buildFilteredStickerUI(
+    ScrollController scrollController,
+    StateSetter modalSetState,
+  ) {
     final Map<String, List<Sticker>> filteredStickers =
         (currentStickerType == 'Recents')
             // Chỉ lấy 5 loại Sticker để hiện ở phần Recents
@@ -336,44 +344,75 @@ class _ChatPageState extends State<ChatPage> {
       child: CustomScrollView(
         controller: scrollController,
         slivers:
-            // Duyệt qua từng phần tử
-            filteredStickers.entries.expand((entry) {
-              // Gọi hàm lấy key là loại Sticker
-              final String stickerType = entry.key;
-              // Gọi hàm lấy value là các Sticker và chỉ lấy đủ số Sticker
-              final List<Sticker> stickers =
-                  (currentStickerType == 'Recents')
-                      ? entry.value.take(5).toList()
-                      : entry.value;
+            filteredStickers.entries
+                .expand((entry) {
+                  // Lấy key là loại của Sticker
+                  final String stickerType = entry.key;
+                  // Lấy value là tất cả các Sticker
+                  final List<Sticker> stickers =
+                      (currentStickerType == 'Recents')
+                          ? entry.value.take(5).toList()
+                          : entry.value;
 
-              return [
-                // Hiện loại Sticker trên đầu list
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Text(
-                      stickerType,
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
-                ),
-                // Tạo list Sticker nếu có Sticker
-                stickers.isNotEmpty
-                    ? _filteredStickerList(stickers)
-                    // Nếu loại Sticker đó rỗng thì trả về:
-                    : SliverToBoxAdapter(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Icon(Icons.add_link, size: 40),
-                      ),
-                    ),
-              ];
-            }).toList(),
+                  return stickers.isNotEmpty
+                      ? [
+                        _showStickerType(
+                          modalSetState,
+                          scrollController,
+                          stickerType,
+                        ),
+                        _filteredStickerList(stickers, stickerType),
+                      ]
+                      : [];
+                })
+                .cast<Widget>()
+                .toList(),
       ),
     );
   }
 
-  Widget _filteredStickerList(List<Sticker> stickers) {
+  Widget _showStickerType(
+    StateSetter modalSetState,
+    ScrollController scrollController,
+    String stickerType,
+  ) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: GestureDetector(
+          onTap: () {
+            isRecentSelected = false;
+
+            // Nếu ấn vào Recents thì không có action
+            stickerType != 'Recents'
+                ? setState(() {
+                  // Tìm thumbnail của Sticker
+                  final stickerThumb = thumbnailSticker.firstWhere(
+                    (sticker) => sticker.type == stickerType,
+                  );
+                  // Nếu đã có, xóa thumbnail
+                  thumbnailSticker.removeWhere((s) => s.type == stickerType);
+                  // Thêm lại vào đầu danh sách
+                  thumbnailSticker.insert(0, stickerThumb);
+                  // Nếu số lượng thumb có thay đổi thì xử lý
+                  if (thumbnailSticker.length > 10) {
+                    thumbnailSticker.removeLast();
+                  }
+                })
+                : isRecentSelected = true;
+
+            modalSetState(() {
+              currentStickerType = stickerType;
+              scrollController.jumpTo(0);
+            });
+          },
+          child: Text(stickerType, style: const TextStyle(fontSize: 20)),
+        ),
+      ),
+    );
+  }
+
+  Widget _filteredStickerList(List<Sticker> stickers, String stickerType) {
     return SliverGrid(
       delegate: SliverChildBuilderDelegate((context, index) {
         final sticker = stickers[index];
@@ -392,6 +431,18 @@ class _ChatPageState extends State<ChatPage> {
               }
               // Thêm Sticker mới chọn vào chat
               chatContent.insert(0, sticker);
+              // Tìm thumbnail của Sticker
+              final stickerThumb = thumbnailSticker.firstWhere(
+                (sticker) => sticker.type == stickerType,
+              );
+              // Nếu đã có, xóa thumbnail
+              thumbnailSticker.removeWhere((s) => s.type == stickerType);
+              // Thêm lại vào đầu danh sách
+              thumbnailSticker.insert(0, stickerThumb);
+              // Nếu số lượng thumb có thay đổi thì xử lý
+              if (thumbnailSticker.length > 10) {
+                thumbnailSticker.removeLast();
+              }
             });
             FocusScope.of(context).unfocus();
           },
