@@ -196,12 +196,10 @@ class _ChatPageState extends State<ChatPage> {
                           modalSetState,
                           scrollController,
                         ),
-                        currentStickerType != 'Shop'
-                            ? Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                              child: _buildSearchStickerUI(),
-                            )
-                            : SizedBox.shrink(),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                          child: _buildSearchStickerUI(),
+                        ),
                         _buildFilteredStickerUI(
                           scrollController,
                           modalSetState,
@@ -232,18 +230,15 @@ class _ChatPageState extends State<ChatPage> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
+          // Tạo thumb cho shop Sticker
+          _shopStickerThumb(modalSetState, scrollController),
           // Tạo thumbnail cho recents Sticker
           Padding(
-            padding: const EdgeInsets.only(right: 5),
+            padding: const EdgeInsets.only(right: 5, left: 10),
             child: _recentStickerThumb(modalSetState, scrollController),
           ),
           // Tạo danh sách thumbnail cho các Sticker
           ..._stickerThumbList(modalSetState, scrollController),
-          // Tạo thumb cho shop Sticker
-          Padding(
-            padding: const EdgeInsets.only(left: 5),
-            child: _shopStickerThumb(modalSetState, scrollController),
-          ),
         ],
       ),
     );
@@ -283,7 +278,7 @@ class _ChatPageState extends State<ChatPage> {
     StateSetter modalSetState,
     ScrollController scrollController,
   ) {
-    // Chỉ lấy 10 thumbnail hiện lên giao diện
+    // Lấy thumbnail hiện lên giao diện
     return List.generate(thumbList.length, (index) {
       Sticker thumbnail = thumbList[index];
       // thumbnail.type == currentStickerType ? isThumbnailSelected = true : false
@@ -324,12 +319,12 @@ class _ChatPageState extends State<ChatPage> {
   ) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          isRecentSelected = false;
+        modalSetState(() {
+          scrollController.jumpTo(0);
         });
         _buildShopStickerUI(scrollController);
       },
-      child: Icon(Icons.add_reaction_outlined),
+      child: Icon(Icons.add_reaction_outlined, size: 25),
     );
   }
 
@@ -380,7 +375,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
         GestureDetector(
           onTap: () {
-            // Đóng modal khi nhấn "Done"
+            // Đóng modal khi nhấn Done
             Navigator.pop(modalContext);
           },
           child: Text(
@@ -413,8 +408,15 @@ class _ChatPageState extends State<ChatPage> {
                         modalSetState,
                         scrollController,
                         stickerType,
+                        entry.value.length,
+                        showCount: true,
                       ),
-                      _filteredStickerList(stickers, stickerType),
+                      _filteredStickerList(
+                        stickers,
+                        stickers.map((sticker) => sticker.type).first,
+                        scrollController,
+                        showDetail: true,
+                      ),
                     ]
                     : [];
               })
@@ -479,8 +481,13 @@ class _ChatPageState extends State<ChatPage> {
                           modalSetState,
                           scrollController,
                           stickerType,
+                          entry.value.length,
                         ),
-                        _filteredStickerList(stickers, stickerType),
+                        _filteredStickerList(
+                          stickers,
+                          stickers.map((sticker) => sticker.type).first,
+                          scrollController,
+                        ),
                       ]
                       : [];
                 })
@@ -494,7 +501,9 @@ class _ChatPageState extends State<ChatPage> {
     StateSetter modalSetState,
     ScrollController scrollController,
     String stickerType,
-  ) {
+    int stickerCount, {
+    bool showCount = false,
+  }) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.only(top: 10),
@@ -517,7 +526,13 @@ class _ChatPageState extends State<ChatPage> {
               scrollController.jumpTo(0);
             });
           },
-          child: Text(stickerType, style: const TextStyle(fontSize: 20)),
+          child:
+              showCount == true
+                  ? Text(
+                    '$stickerType ($stickerCount)',
+                    style: const TextStyle(fontSize: 20),
+                  )
+                  : Text(stickerType, style: TextStyle(fontSize: 20)),
         ),
       ),
     );
@@ -541,33 +556,51 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  Widget _filteredStickerList(List<Sticker> stickers, String stickerType) {
+  Widget _filteredStickerList(
+    List<Sticker> stickers,
+    String stickerType,
+    ScrollController scrollController, {
+    bool showDetail = false,
+    bool isViewOnly = false,
+  }) {
     return SliverGrid(
       delegate: SliverChildBuilderDelegate((context, index) {
         final sticker = stickers[index];
         return GestureDetector(
           onLongPress: () => _showStickerPreview(sticker),
-          onTap: () {
-            Navigator.of(context).pop();
-            // Nếu Sticker đã có trong Recents, xóa Sticker
-            setState(() {
-              recentsStickerList.removeWhere((s) => s.path == sticker.path);
-              // Thêm lại Sticker vào đầu danh sách
-              recentsStickerList.insert(0, sticker);
-              // Chỉ hiển thị 5 Sticker
-              if (recentsStickerList.length > 5) {
-                recentsStickerList.removeAt(5);
-              }
-              // Thêm Sticker mới chọn vào chat
-              chatContentList.insert(0, sticker);
-              _updateThumbnailSticker(
-                stickerThumb: thumbList,
-                stickerType: stickerType,
-                maxLength: thumbList.length,
-              );
-            });
-            FocusScope.of(context).unfocus();
-          },
+          onTap:
+              isViewOnly
+                  ? () {}
+                  : () {
+                    showDetail == true
+                        ? _buildDetailShopStickerUI(
+                          scrollController,
+                          stickerType,
+                        )
+                        : {
+                          Navigator.of(context).pop(),
+                          // Nếu Sticker đã có trong Recents, xóa Sticker
+                          setState(() {
+                            recentsStickerList.removeWhere(
+                              (s) => s.path == sticker.path,
+                            );
+                            // Thêm lại Sticker vào đầu danh sách
+                            recentsStickerList.insert(0, sticker);
+                            // Chỉ hiển thị 5 Sticker
+                            if (recentsStickerList.length > 5) {
+                              recentsStickerList.removeAt(5);
+                            }
+                            // Thêm Sticker mới chọn vào chat
+                            chatContentList.insert(0, sticker);
+                            _updateThumbnailSticker(
+                              stickerThumb: thumbList,
+                              stickerType: stickerType,
+                              maxLength: thumbList.length,
+                            );
+                          }),
+                          FocusScope.of(context).unfocus(),
+                        };
+                  },
           onLongPressEnd: (_) => _hideStickerPreview(),
           child: Image.asset(sticker.path),
         );
@@ -577,6 +610,89 @@ class _ChatPageState extends State<ChatPage> {
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),
+    );
+  }
+
+  Future<T?> _buildDetailShopStickerUI<T>(
+    ScrollController scrollController,
+    String stickerType,
+  ) {
+    return showModalBottomSheet<T>(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: Colors.black, width: 0.5),
+      ),
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext modalContext) {
+        return StatefulBuilder(
+          builder: (
+            BuildContext statefulBuilderContext,
+            StateSetter modalSetState,
+          ) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.4,
+              maxChildSize: 0.7,
+              minChildSize: 0.2,
+              expand: false,
+              builder: (context, scrollController) {
+                return Padding(
+                  padding: EdgeInsets.all(
+                    MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  child: CustomScrollView(
+                    controller: scrollController,
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // GestureDetector(
+                              //   onTap: () {
+                              //     Navigator.pop(context);
+                              //   },
+                              //   child: Center(
+                              //     child: Text(
+                              //       'Cancel',
+                              //       style: TextStyle(fontSize: 18),
+                              //     ),
+                              //   ),
+                              // ),
+                              Text(
+                                stickerType,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              // Icon(Icons.share),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SliverPadding(
+                        padding: EdgeInsets.all(
+                          MediaQuery.of(context).size.height * 0.02,
+                        ),
+                        sliver: _filteredStickerList(
+                          allStickerList[stickerType] ?? [],
+                          stickerType,
+                          scrollController,
+                          isViewOnly: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 
