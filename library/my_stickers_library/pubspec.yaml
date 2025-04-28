@@ -33,6 +33,8 @@ flutter:
     - assets/christmas/mr_christmas.png
     - assets/love/love_birds.png
     - assets/love/love_dog.png
+    - assets/food/french_fries.png
+    - assets/food/pizza.png
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/to/asset-from-package
