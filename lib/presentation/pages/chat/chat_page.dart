@@ -12,6 +12,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   // Tạo danh sách tất cả Sticker
   Map<String, List<Sticker>> allStickerList = {};
+  Map<String, List<Sticker>> allStickerPro = {};
   // Để lưu Sticker đuọc chọn gần đây
   List<Sticker> recentsStickerList = [];
   // Lưu nội dung sticker vào chat
@@ -38,6 +39,7 @@ class _ChatPageState extends State<ChatPage> {
       'Recents': recentsStickerList,
       ...MyStickers.getStickersByType(),
     };
+    allStickerPro = MyStickers.getStickerPro();
   }
 
   @override
@@ -394,7 +396,7 @@ class _ChatPageState extends State<ChatPage> {
     return CustomScrollView(
       controller: scrollController,
       slivers:
-          allStickerList.entries
+          allStickerPro.entries
               .where((entry) => entry.key != 'Recents')
               .expand((entry) {
                 // Lấy key là loại của Sticker
@@ -594,7 +596,7 @@ class _ChatPageState extends State<ChatPage> {
                             chatContentList.insert(0, sticker);
                             _updateThumbnailSticker(
                               stickerThumb: thumbList,
-                              stickerType: stickerType,
+                              stickerType: sticker.type,
                               maxLength: thumbList.length,
                             );
                           }),
@@ -679,7 +681,7 @@ class _ChatPageState extends State<ChatPage> {
                           MediaQuery.of(context).size.height * 0.02,
                         ),
                         sliver: _filteredStickerList(
-                          allStickerList[stickerType] ?? [],
+                          allStickerPro[stickerType] ?? [],
                           stickerType,
                           scrollController,
                           isViewOnly: true,
