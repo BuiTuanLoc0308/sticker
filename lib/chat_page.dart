@@ -12,7 +12,8 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   // Tạo danh sách tất cả Sticker
   Map<String, List<Sticker>> allStickerList = {};
-  Map<String, List<Sticker>> allStickerPro = {};
+  // Danh sách các Sticker Pro
+  Map<String, List<Sticker>> allStickerPro = MyStickers.getStickerPro();
   // Để lưu Sticker đuọc chọn gần đây
   List<Sticker> recentsStickerList = [];
   // Lưu nội dung sticker vào chat
@@ -25,7 +26,7 @@ class _ChatPageState extends State<ChatPage> {
   List<Sticker> thumbList = MyStickers.getStickerThumb();
   // Lấy type Sticker của Sticker hiện tại
   String currentStickerType = '';
-
+  // Kiểm tra xem Recents có được chọn hay không
   bool isRecentSelected = false;
 
   @override
@@ -37,9 +38,8 @@ class _ChatPageState extends State<ChatPage> {
     // Đưa Recents và các Sticker của Recents vào allSticker
     allStickerList = {
       'Recents': recentsStickerList,
-      ...MyStickers.getStickersByType(),
+      ...MyStickers.getAllSticker(),
     };
-    allStickerPro = MyStickers.getStickerPro();
   }
 
   @override
@@ -93,8 +93,8 @@ class _ChatPageState extends State<ChatPage> {
             alignment: Alignment.centerRight,
             child: SizedBox(
               // Độ lớn dựa theo % độ lớn màn hình
-              width: MediaQuery.of(context).size.width * 0.25,
-              height: MediaQuery.of(context).size.width * 0.25,
+              width: MediaQuery.of(context).size.height * 0.25,
+              height: MediaQuery.of(context).size.height * 0.25,
               child: Image.asset(chatContentList[index].path),
             ),
           ),
@@ -187,10 +187,8 @@ class _ChatPageState extends State<ChatPage> {
                 builder: (context, scrollController) {
                   return Padding(
                     padding: EdgeInsets.only(
-                      left: 20,
-                      right: 20,
-                      // Cách màn hình 1%
-                      bottom: MediaQuery.of(chatBodyContext).size.height * 0.01,
+                      left: MediaQuery.of(chatBodyContext).size.width * 0.03,
+                      right: MediaQuery.of(chatBodyContext).size.width * 0.03,
                     ),
                     child: Column(
                       children: [
@@ -417,7 +415,7 @@ class _ChatPageState extends State<ChatPage> {
                         stickers,
                         stickers.map((sticker) => sticker.type).first,
                         scrollController,
-                        showDetail: true,
+                        isLocked: false,
                       ),
                     ]
                     : [];
@@ -489,6 +487,7 @@ class _ChatPageState extends State<ChatPage> {
                           stickers,
                           stickers.map((sticker) => sticker.type).first,
                           scrollController,
+                          isLocked: true,
                         ),
                       ]
                       : [];
@@ -562,8 +561,8 @@ class _ChatPageState extends State<ChatPage> {
     List<Sticker> stickers,
     String stickerType,
     ScrollController scrollController, {
-    bool showDetail = false,
     bool isViewOnly = false,
+    bool isLocked = false,
   }) {
     return SliverGrid(
       delegate: SliverChildBuilderDelegate((context, index) {
@@ -574,7 +573,7 @@ class _ChatPageState extends State<ChatPage> {
               isViewOnly
                   ? () {}
                   : () {
-                    showDetail == true
+                    sticker.isPro
                         ? _buildDetailShopStickerUI(
                           scrollController,
                           stickerType,
@@ -604,7 +603,15 @@ class _ChatPageState extends State<ChatPage> {
                         };
                   },
           onLongPressEnd: (_) => _hideStickerPreview(),
-          child: Image.asset(sticker.path),
+          child:
+              sticker.isPro && isLocked
+                  ? Stack(
+                    children: [
+                      Opacity(opacity: 0.5, child: Image.asset(sticker.path)),
+                      Center(child: Icon(Icons.lock, color: Colors.red)),
+                    ],
+                  )
+                  : Image.asset(sticker.path),
         );
       }, childCount: stickers.length),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -685,6 +692,28 @@ class _ChatPageState extends State<ChatPage> {
                           stickerType,
                           scrollController,
                           isViewOnly: true,
+                          isLocked: false,
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).size.height * 0.015,
+                          ),
+                          child: MaterialButton(
+                            padding: EdgeInsets.all(
+                              MediaQuery.of(context).size.height * 0.015,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            color: Colors.blue,
+                            onPressed: () {},
+                            child: Text(
+                              'Add to Library',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ),
                         ),
                       ),
                     ],

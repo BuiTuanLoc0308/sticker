@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sticker_app/presentation/pages/chat/chat_page.dart';
+import 'package:sticker_app/chat_page.dart';
 
 void main() {
   runApp(const MyApp());

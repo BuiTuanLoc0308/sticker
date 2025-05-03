@@ -29,12 +29,16 @@ flutter:
   assets:
     - assets/koala/koala_birthday.png
     - assets/koala/koala_sleep.png
+    - assets/koala/koala_night.png
     - assets/christmas/christmas_tree.png
     - assets/christmas/mr_christmas.png
+    - assets/christmas/christmas_cat.png
     - assets/love/love_birds.png
+    - assets/love/love_bee.png
     - assets/love/love_dog.png
     - assets/food/french_fries.png
     - assets/food/pizza.png
+    - assets/food/burger.png
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/to/asset-from-package
