@@ -11,7 +11,6 @@ class StickerShop extends StatefulWidget {
   Map<String, List<Sticker>> allStickerPro;
   bool isRecentSelected;
   List<Sticker> thumbList;
-  String currentStickerType;
   List<Sticker> recentsStickerList;
   List<Sticker> chatContentList;
 
@@ -22,7 +21,6 @@ class StickerShop extends StatefulWidget {
     required this.allStickerPro,
     required this.isRecentSelected,
     required this.thumbList,
-    required this.currentStickerType,
     required this.recentsStickerList,
     required this.chatContentList,
   });
@@ -64,7 +62,7 @@ class _StickerShopState extends State<StickerShop> {
           ) {
             return Padding(
               padding: EdgeInsets.all(
-                MediaQuery.of(context).size.height * 0.02,
+                MediaQuery.of(context).size.height * 0.01,
               ),
               child: Column(
                 children: [
@@ -129,12 +127,8 @@ class _StickerShopState extends State<StickerShop> {
                         showCount: true,
                         isRecentSelected: widget.isRecentSelected,
                         thumbList: widget.thumbList,
-                        onStickerTypeChanged: (newType) {
-                          setState(() {
-                            widget.currentStickerType = newType;
-                            widget.isRecentSelected = false;
-                          });
-                        },
+                        isViewOnly: true,
+                        onStickerTypeChanged: (newType) {},
                       ),
                       StickerGrid(
                         stickers: stickers,

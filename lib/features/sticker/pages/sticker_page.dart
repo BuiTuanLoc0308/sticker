@@ -16,6 +16,7 @@ Future<T?> stickerPicker<T>({
   required Function(String) onStickerTypeChanged,
 }) async {
   FocusScope.of(context).unfocus();
+  final screenSize = MediaQuery.of(context).size.width;
 
   final result = await showModalBottomSheet<T>(
     // Không làm mờ đằng sau modal
@@ -54,8 +55,8 @@ Future<T?> stickerPicker<T>({
               builder: (context, scrollController) {
                 return Padding(
                   padding: EdgeInsets.only(
-                    left: MediaQuery.of(context).size.width * 0.02,
-                    right: MediaQuery.of(context).size.width * 0.02,
+                    left: screenSize * 0.02,
+                    right: screenSize * 0.02,
                   ),
                   child: Column(
                     children: [
@@ -91,6 +92,12 @@ Future<T?> stickerPicker<T>({
                         recentsStickerList: recentsStickerList,
                         chatContentList: chatContentList,
                         allStickerPro: allStickerPro,
+                        onStickerTypeChanged: (newType) {
+                          modalSetState(() {
+                            currentStickerType = newType;
+                            isRecentSelected = false;
+                          });
+                        },
                       ),
                     ],
                   ),

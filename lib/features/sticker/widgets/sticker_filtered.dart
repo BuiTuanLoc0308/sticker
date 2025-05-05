@@ -14,6 +14,7 @@ class StickerFiltered extends StatefulWidget {
   List<Sticker> recentsStickerList;
   List<Sticker> chatContentList;
   Map<String, List<Sticker>> allStickerPro;
+  Function(String) onStickerTypeChanged;
 
   StickerFiltered({
     super.key,
@@ -26,6 +27,7 @@ class StickerFiltered extends StatefulWidget {
     required this.recentsStickerList,
     required this.chatContentList,
     required this.allStickerPro,
+    required this.onStickerTypeChanged,
   });
 
   @override
@@ -67,6 +69,10 @@ class _StickerFilteredState extends State<StickerFiltered> {
                           stickerType: stickerType,
                           stickerCount: entry.value.length,
                           showCount: false,
+                          isViewOnly:
+                              widget.currentStickerType == 'Recents'
+                                  ? false
+                                  : true,
                           isRecentSelected: widget.isRecentSelected,
                           thumbList: widget.thumbList,
                           onStickerTypeChanged: (newType) {
@@ -74,13 +80,17 @@ class _StickerFilteredState extends State<StickerFiltered> {
                               widget.currentStickerType = newType;
                               widget.isRecentSelected = false;
                             });
+                            widget.onStickerTypeChanged(newType);
                           },
                         ),
                         StickerGrid(
                           stickers: stickers,
                           stickerType: stickerType,
                           scrollController: widget.scrollController,
-                          isViewOnly: false,
+                          isViewOnly:
+                              widget.currentStickerType == 'Recents'
+                                  ? true
+                                  : false,
                           isLocked: true,
                           thumbList: widget.thumbList,
                           recentsStickerList: widget.recentsStickerList,

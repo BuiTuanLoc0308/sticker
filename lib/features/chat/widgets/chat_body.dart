@@ -52,6 +52,7 @@ class _ChatBodyState extends State<ChatBody> {
   }
 
   Widget _chatContentList() {
+    final screenSize = MediaQuery.of(context).size.width;
     return ListView.builder(
       reverse: true,
       itemCount: chatContentList.length,
@@ -62,8 +63,8 @@ class _ChatBodyState extends State<ChatBody> {
             alignment: Alignment.centerRight,
             child: SizedBox(
               // Độ lớn dựa theo % độ lớn màn hình
-              width: MediaQuery.of(context).size.width * 0.25,
-              height: MediaQuery.of(context).size.width * 0.25,
+              width: screenSize * 0.25,
+              height: screenSize * 0.25,
               child: Image.asset(chatContentList[index].path),
             ),
           ),

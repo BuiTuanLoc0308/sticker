@@ -70,10 +70,10 @@ class _StickerGridState extends State<StickerGrid> {
                             }
                             // Thêm Sticker mới chọn vào chat
                             widget.chatContentList.insert(0, sticker);
+
                             updateThumbnailSticker(
                               stickerThumb: widget.thumbList,
                               stickerType: sticker.type,
-                              maxLength: widget.thumbList.length,
                             );
                           }),
                           FocusScope.of(context).unfocus(),

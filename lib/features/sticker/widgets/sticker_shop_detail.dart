@@ -11,6 +11,8 @@ Future<T?> stickerShopDetail<T>({
   required List<Sticker> recentsStickerList,
   required List<Sticker> chatContentList,
 }) {
+  final screenSize = MediaQuery.of(context).size.height;
+
   return showModalBottomSheet<T>(
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),
@@ -31,17 +33,17 @@ Future<T?> stickerShopDetail<T>({
             expand: false,
             builder: (context, scrollController) {
               return Padding(
-                padding: EdgeInsets.all(
-                  MediaQuery.of(context).size.height * 0.01,
+                padding: EdgeInsets.only(
+                  top: screenSize * 0.01,
+                  left: screenSize * 0.01,
+                  right: screenSize * 0.01,
                 ),
                 child: CustomScrollView(
                   controller: scrollController,
                   slivers: [
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.02,
-                        ),
+                        padding: EdgeInsets.only(top: screenSize * 0.005),
                         child: Center(
                           child: Text(
                             stickerType,
@@ -54,9 +56,7 @@ Future<T?> stickerShopDetail<T>({
                       ),
                     ),
                     SliverPadding(
-                      padding: EdgeInsets.all(
-                        MediaQuery.of(context).size.height * 0.02,
-                      ),
+                      padding: EdgeInsets.all(screenSize * 0.01),
                       sliver: StickerGrid(
                         stickers: allStickerPro[stickerType] ?? [],
                         stickerType: stickerType,
@@ -71,13 +71,9 @@ Future<T?> stickerShopDetail<T>({
                     ),
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).size.height * 0.015,
-                        ),
+                        padding: EdgeInsets.only(bottom: screenSize * 0.02),
                         child: MaterialButton(
-                          padding: EdgeInsets.all(
-                            MediaQuery.of(context).size.height * 0.015,
-                          ),
+                          padding: EdgeInsets.all(screenSize * 0.015),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

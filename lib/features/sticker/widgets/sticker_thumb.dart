@@ -46,7 +46,6 @@ class _StickerThumbState extends State<StickerThumb> {
             allStickerPro: widget.allStickerPro,
             isRecentSelected: widget.isRecentSelected,
             thumbList: widget.thumbList,
-            currentStickerType: widget.currentStickerType,
             recentsStickerList: widget.recentsStickerList,
             chatContentList: widget.chatContentList,
           ),
