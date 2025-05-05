@@ -62,15 +62,8 @@ class MyStickers {
   static Map<String, List<Sticker>> getAllSticker() {
     final grouped = groupBy(_allSticker, (Sticker s) => s.type);
 
-    // Shuffle từng list sticker trong từng group
-    final shuffledGrouped = grouped.map((key, stickers) {
-      final shuffledStickers = List<Sticker>.from(stickers)..shuffle();
-
-      return MapEntry(key, shuffledStickers);
-    });
-
     // Sau đó shuffle luôn thứ tự các nhóm
-    final shuffledEntries = shuffledGrouped.entries.toList()..shuffle();
+    final shuffledEntries = grouped.entries.toList()..shuffle();
 
     return Map.fromEntries(shuffledEntries);
   }
@@ -85,7 +78,8 @@ class MyStickers {
 
   static List<Sticker> getStickerThumb() {
     final grouped = groupBy(_allSticker, (Sticker s) => s.type);
-    final thumbs = grouped.values.map((stickers) => stickers.first).toList();
+    final thumbs = grouped.values.map((stickers) => stickers.first).toList()
+      ..shuffle();
 
     return thumbs;
   }
