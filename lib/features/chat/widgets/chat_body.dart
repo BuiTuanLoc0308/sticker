@@ -53,6 +53,7 @@ class _ChatBodyState extends State<ChatBody> {
 
   Widget _chatContentList() {
     final screenSize = MediaQuery.of(context).size.width;
+
     return ListView.builder(
       reverse: true,
       itemCount: chatContentList.length,
@@ -102,7 +103,7 @@ class _ChatBodyState extends State<ChatBody> {
       minLines: 1,
       maxLines: 5,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+        contentPadding: const EdgeInsets.only(left: 20),
         border: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.black),
           borderRadius: BorderRadius.circular(30),
@@ -112,6 +113,7 @@ class _ChatBodyState extends State<ChatBody> {
           onTap: () async {
             // Tránh tự động mở bàn phím
             _focusNode.unfocus();
+
             await stickerPicker(
               context: context,
               allStickerPro: allStickerPro,
@@ -124,6 +126,7 @@ class _ChatBodyState extends State<ChatBody> {
               onStickerTypeChanged: (newType) {
                 setState(() {
                   currentStickerType = newType;
+                  isRecentSelected = newType == 'Recents' ? true : false;
                 });
               },
             );

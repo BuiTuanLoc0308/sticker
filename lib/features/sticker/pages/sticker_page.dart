@@ -79,7 +79,10 @@ Future<T?> stickerPicker<T>({
                         },
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                        padding: EdgeInsets.only(
+                          top: screenSize * 0.02,
+                          bottom: screenSize * 0.01,
+                        ),
                         child: StickerSearch(),
                       ),
                       StickerFiltered(

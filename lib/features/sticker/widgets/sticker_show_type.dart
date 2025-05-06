@@ -36,7 +36,9 @@ class _StickerShowTypeState extends State<StickerShowType> {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.only(top: 10),
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).size.height * 0.005,
+        ),
         child: GestureDetector(
           onTap:
               widget.isViewOnly
@@ -67,7 +69,8 @@ class _StickerShowTypeState extends State<StickerShowType> {
                   : Row(
                     children: [
                       Text(widget.stickerType, style: TextStyle(fontSize: 20)),
-                      if (!widget.isViewOnly) Icon(Icons.chevron_right),
+                      if (!widget.isViewOnly && widget.stickerType != 'Recents')
+                        Icon(Icons.chevron_right),
                     ],
                   ),
         ),

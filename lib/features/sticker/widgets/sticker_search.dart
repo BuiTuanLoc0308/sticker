@@ -5,6 +5,8 @@ class StickerSearch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size.width;
+
     return SizedBox(
       height: 40,
       child: TextFormField(
@@ -12,7 +14,7 @@ class StickerSearch extends StatelessWidget {
           FocusScope.of(context).unfocus();
         },
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+          contentPadding: EdgeInsets.symmetric(horizontal: screenSize * 0.01),
           border: OutlineInputBorder(
             borderSide: const BorderSide(color: Colors.black),
             borderRadius: BorderRadius.circular(30),
@@ -20,7 +22,7 @@ class StickerSearch extends StatelessWidget {
           hintText: 'Search stickers',
           hintStyle: const TextStyle(color: Colors.grey),
           prefixIcon: Padding(
-            padding: const EdgeInsets.only(right: 0, left: 10),
+            padding: EdgeInsets.only(left: screenSize * 0.03),
             child: const Icon(Icons.search),
           ),
           prefixIconConstraints: BoxConstraints(minWidth: 0),

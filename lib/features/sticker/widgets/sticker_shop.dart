@@ -62,7 +62,7 @@ class _StickerShopState extends State<StickerShop> {
           ) {
             return Padding(
               padding: EdgeInsets.all(
-                MediaQuery.of(context).size.height * 0.01,
+                MediaQuery.of(context).size.height * 0.015,
               ),
               child: Column(
                 children: [
@@ -80,11 +80,17 @@ class _StickerShopState extends State<StickerShop> {
   }
 
   Widget _topShopStickerUI(BuildContext modalContext) {
+    final screenSize = MediaQuery.of(context).size.height;
+
     return Row(
       children: [
         Flexible(
           child: Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 10, right: 10),
+            padding: EdgeInsets.only(
+              top: screenSize * 0.01,
+              bottom: screenSize * 0.005,
+              right: screenSize * 0.01,
+            ),
             child: StickerSearch(),
           ),
         ),

@@ -15,7 +15,10 @@ Future<T?> stickerShopDetail<T>({
 
   return showModalBottomSheet<T>(
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(10),
+        topRight: Radius.circular(10),
+      ),
       side: BorderSide(color: Colors.black, width: 0.5),
     ),
     isScrollControlled: true,
@@ -46,7 +49,7 @@ Future<T?> stickerShopDetail<T>({
                         padding: EdgeInsets.only(top: screenSize * 0.005),
                         child: Center(
                           child: Text(
-                            stickerType,
+                            '$stickerType Premium',
                             style: TextStyle(
                               fontSize: 25,
                               fontWeight: FontWeight.bold,
@@ -71,7 +74,10 @@ Future<T?> stickerShopDetail<T>({
                     ),
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.only(bottom: screenSize * 0.02),
+                        padding: EdgeInsets.only(
+                          top: screenSize * 0.01,
+                          bottom: screenSize * 0.02,
+                        ),
                         child: MaterialButton(
                           padding: EdgeInsets.all(screenSize * 0.015),
                           shape: RoundedRectangleBorder(

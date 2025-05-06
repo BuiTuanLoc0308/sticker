@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-PreferredSizeWidget? chatAppBar(BuildContext buildContext) {
+PreferredSizeWidget? chatAppBar(BuildContext context) {
+  final screenSize = MediaQuery.of(context).size.width;
+
   return AppBar(
     leading: IconButton(
       onPressed: () {
@@ -9,10 +11,13 @@ PreferredSizeWidget? chatAppBar(BuildContext buildContext) {
       icon: const Icon(Icons.arrow_back_ios),
     ),
     title: const Text('username'),
-    actions: const [
+    actions: [
       Icon(Icons.phone),
       Padding(
-        padding: EdgeInsets.only(right: 10, left: 10),
+        padding: EdgeInsets.only(
+          right: screenSize * 0.03,
+          left: screenSize * 0.02,
+        ),
         child: Icon(Icons.video_camera_back),
       ),
     ],

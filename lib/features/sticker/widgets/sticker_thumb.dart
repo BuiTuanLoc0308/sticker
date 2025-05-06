@@ -51,7 +51,7 @@ class _StickerThumbState extends State<StickerThumb> {
           ),
           // Tạo thumbnail cho recents Sticker
           Padding(
-            padding: const EdgeInsets.only(right: 5, left: 10),
+            padding: EdgeInsets.only(right: 5, left: 10),
             child: StickerRecent(
               isRecentSelected: widget.isRecentSelected,
               modalSetState: widget.modalSetState,
