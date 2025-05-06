@@ -78,8 +78,7 @@ class _StickerFilteredState extends State<StickerFiltered> {
                           onStickerTypeChanged: (newType) {
                             setState(() {
                               widget.currentStickerType = newType;
-                              widget.isRecentSelected =
-                                  newType == 'Recents' ? true : false;
+                              widget.isRecentSelected = newType == 'Recents';
                             });
                             widget.onStickerTypeChanged(newType);
                           },

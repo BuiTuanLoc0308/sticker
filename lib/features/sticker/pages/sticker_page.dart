@@ -98,7 +98,7 @@ Future<T?> stickerPicker<T>({
                         onStickerTypeChanged: (newType) {
                           modalSetState(() {
                             currentStickerType = newType;
-                            isRecentSelected = false;
+                            isRecentSelected = newType == 'Recents';
                           });
                         },
                       ),

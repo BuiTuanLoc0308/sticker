@@ -59,7 +59,7 @@ class _ChatBodyState extends State<ChatBody> {
       itemCount: chatContentList.length,
       itemBuilder: (context, index) {
         return Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(screenSize * 0.01),
           child: Align(
             alignment: Alignment.centerRight,
             child: SizedBox(
@@ -75,6 +75,8 @@ class _ChatBodyState extends State<ChatBody> {
   }
 
   Widget _buildBottomChatUI(BuildContext chatBodyContext) {
+    final screenSize = MediaQuery.of(context).size.width;
+
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Row(
@@ -82,7 +84,10 @@ class _ChatBodyState extends State<ChatBody> {
           Icon(Icons.add_circle, size: 30),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 10, right: 10),
+              padding: EdgeInsets.only(
+                left: screenSize * 0.02,
+                right: screenSize * 0.02,
+              ),
               child: _textChatInputField(chatBodyContext),
             ),
           ),
@@ -103,7 +108,9 @@ class _ChatBodyState extends State<ChatBody> {
       minLines: 1,
       maxLines: 5,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.only(left: 20),
+        contentPadding: EdgeInsets.only(
+          left: MediaQuery.of(context).size.width * 0.04,
+        ),
         border: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.black),
           borderRadius: BorderRadius.circular(30),
@@ -126,7 +133,7 @@ class _ChatBodyState extends State<ChatBody> {
               onStickerTypeChanged: (newType) {
                 setState(() {
                   currentStickerType = newType;
-                  isRecentSelected = newType == 'Recents' ? true : false;
+                  isRecentSelected = newType == 'Recents';
                 });
               },
             );

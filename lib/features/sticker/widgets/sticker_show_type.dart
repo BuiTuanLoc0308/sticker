@@ -44,7 +44,12 @@ class _StickerShowTypeState extends State<StickerShowType> {
               widget.isViewOnly
                   ? () {}
                   : () {
-                    widget.isRecentSelected = false;
+                    widget.isRecentSelected = widget.stickerType == 'Recents';
+                    // Nếu đã là Recents và đang được chọn => không làm gì
+                    if (widget.stickerType == 'Recents' &&
+                        widget.isRecentSelected) {
+                      return;
+                    }
                     // Nếu ấn vào Recents thì không có action
                     widget.stickerType != 'Recents'
                         ? setState(() {
