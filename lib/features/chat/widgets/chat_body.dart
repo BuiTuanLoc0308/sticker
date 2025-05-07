@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_stickers/data/models/sticker.dart';
 import 'package:my_stickers/data/stickers_data.dart';
 import 'package:sticker_app/features/sticker/pages/sticker_page.dart';
+import 'package:sticker_app/features/sticker/widgets/sticker_custom_uploader.dart';
 
 class ChatBody extends StatefulWidget {
   const ChatBody({super.key});
@@ -81,7 +82,12 @@ class _ChatBodyState extends State<ChatBody> {
       padding: const EdgeInsets.all(10),
       child: Row(
         children: [
-          Icon(Icons.add_circle, size: 30),
+          GestureDetector(
+            onTap: () {
+              customStickerUploader(context: context);
+            },
+            child: Icon(Icons.add_circle, size: 30),
+          ),
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(
@@ -137,6 +143,10 @@ class _ChatBodyState extends State<ChatBody> {
                 });
               },
             );
+
+            if (mounted) {
+              _focusNode.unfocus();
+            }
           },
           child: const Icon(Icons.emoji_emotions, size: 30),
         ),

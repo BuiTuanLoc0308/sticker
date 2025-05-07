@@ -16,6 +16,7 @@ Future<T?> stickerPicker<T>({
   required Function(String) onStickerTypeChanged,
 }) async {
   FocusScope.of(context).unfocus();
+
   final screenSize = MediaQuery.of(context).size.width;
 
   final result = await showModalBottomSheet<T>(
@@ -55,8 +56,8 @@ Future<T?> stickerPicker<T>({
               builder: (context, scrollController) {
                 return Padding(
                   padding: EdgeInsets.only(
-                    left: screenSize * 0.02,
-                    right: screenSize * 0.02,
+                    left: screenSize * 0.03,
+                    right: screenSize * 0.03,
                   ),
                   child: Column(
                     children: [
@@ -112,10 +113,6 @@ Future<T?> stickerPicker<T>({
       );
     },
   );
-  // Tránh tự động mở chat sau khi tắt modal
-  if (context.mounted) {
-    FocusScope.of(context).unfocus();
-  }
 
   return result;
 }

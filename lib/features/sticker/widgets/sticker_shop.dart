@@ -134,7 +134,7 @@ class _StickerShopState extends State<StickerShop> {
                         isRecentSelected: widget.isRecentSelected,
                         thumbList: widget.thumbList,
                         isViewOnly: true,
-                        onStickerTypeChanged: (newType) {},
+                        onStickerTypeChanged: (_) {},
                       ),
                       StickerGrid(
                         stickers: stickers,

@@ -11,9 +11,9 @@ class MyStickers {
                 type: 'Koala',
               ),
               Sticker(
-                  path: 'packages/my_stickers/assets/koala/koala_sleep.png',
-                  type: 'Koala',
-                  isPro: true),
+                path: 'packages/my_stickers/assets/koala/koala_sleep.png',
+                type: 'Koala',
+              ),
               Sticker(
                   path: 'packages/my_stickers/assets/koala/koala_night.png',
                   type: 'Koala',
@@ -23,19 +23,19 @@ class MyStickers {
                       'packages/my_stickers/assets/christmas/mr_christmas.png',
                   type: 'Christmas'),
               Sticker(
-                  path:
-                      'packages/my_stickers/assets/christmas/christmas_tree.png',
-                  type: 'Christmas',
-                  isPro: true),
+                path:
+                    'packages/my_stickers/assets/christmas/christmas_tree.png',
+                type: 'Christmas',
+              ),
               Sticker(
                   path:
                       'packages/my_stickers/assets/christmas/christmas_cat.png',
                   type: 'Christmas',
                   isPro: true),
               Sticker(
-                  path: 'packages/my_stickers/assets/love/love_birds.png',
-                  type: 'Love',
-                  isPro: true),
+                path: 'packages/my_stickers/assets/love/love_birds.png',
+                type: 'Love',
+              ),
               Sticker(
                   path: 'packages/my_stickers/assets/love/love_bee.png',
                   type: 'Love',
@@ -45,9 +45,9 @@ class MyStickers {
                 type: 'Love',
               ),
               Sticker(
-                  path: 'packages/my_stickers/assets/food/french_fries.png',
-                  type: 'Food',
-                  isPro: true),
+                path: 'packages/my_stickers/assets/food/french_fries.png',
+                type: 'Food',
+              ),
               Sticker(
                   path: 'packages/my_stickers/assets/food/burger.png',
                   type: 'Food',
@@ -59,13 +59,35 @@ class MyStickers {
             ]).expand((e) => e),
   ];
 
+  // static Map<String, List<Sticker>> getAllSticker() {
+  //   final grouped = groupBy(_allSticker, (Sticker s) => s.type);
+
+  //   // Sau đó shuffle luôn thứ tự các nhóm
+  //   final shuffledEntries = grouped.entries.toList()..shuffle();
+
+  //   return Map.fromEntries(shuffledEntries);
+  // }
+
   static Map<String, List<Sticker>> getAllSticker() {
-    final grouped = groupBy(_allSticker, (Sticker s) => s.type);
+    final Map<String, List<Sticker>> groupedStickers = {};
 
-    // Sau đó shuffle luôn thứ tự các nhóm
-    final shuffledEntries = grouped.entries.toList()..shuffle();
+    for (final sticker in _allSticker) {
+      groupedStickers.putIfAbsent(sticker.type, () => []);
+      groupedStickers[sticker.type]!.add(sticker);
+    }
 
-    return Map.fromEntries(shuffledEntries);
+    // Sắp xếp mỗi nhóm: isPro == false trước, isPro == true sau
+    for (final type in groupedStickers.keys) {
+      groupedStickers[type]!.sort((a, b) {
+        if (a.isPro == b.isPro) return 0;
+        return a.isPro ? 1 : -1;
+      });
+    }
+
+    final entries = groupedStickers.entries.toList()..shuffle();
+    final shuffledMap = Map<String, List<Sticker>>.fromEntries(entries);
+
+    return shuffledMap;
   }
 
   static Map<String, List<Sticker>> getStickerPro() {
