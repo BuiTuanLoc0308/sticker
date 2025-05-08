@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_stickers/data/models/sticker.dart';
+import 'package:sticker_app/features/sticker/widgets/sticker_add.dart';
 import 'package:sticker_app/features/sticker/widgets/sticker_recent.dart';
 import 'package:sticker_app/features/sticker/widgets/sticker_shop.dart';
 
@@ -35,6 +36,8 @@ class StickerThumb extends StatefulWidget {
 class _StickerThumbState extends State<StickerThumb> {
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size.width;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -49,21 +52,26 @@ class _StickerThumbState extends State<StickerThumb> {
             recentsStickerList: widget.recentsStickerList,
             chatContentList: widget.chatContentList,
           ),
-          // Tạo thumbnail cho recents Sticker
           Padding(
-            padding: EdgeInsets.only(right: 5, left: 10),
-            child: StickerRecent(
-              isRecentSelected: widget.isRecentSelected,
-              modalSetState: widget.modalSetState,
-              currentStickerType: widget.currentStickerType,
-              scrollController: widget.scrollController,
-              onStickerTypeChanged: (newType) {
-                widget.modalSetState(() {
-                  widget.onStickerTypeChanged(newType);
-                });
-              },
+            padding: EdgeInsets.only(
+              left: screenSize * 0.04,
+              right: screenSize * 0.02,
             ),
+            child: StickerAdd(),
           ),
+          // Tạo thumbnail cho recents Sticker
+          StickerRecent(
+            isRecentSelected: widget.isRecentSelected,
+            modalSetState: widget.modalSetState,
+            currentStickerType: widget.currentStickerType,
+            scrollController: widget.scrollController,
+            onStickerTypeChanged: (newType) {
+              widget.modalSetState(() {
+                widget.onStickerTypeChanged(newType);
+              });
+            },
+          ),
+
           // Tạo danh sách thumbnail cho các Sticker
           ..._stickerThumbList(widget.modalSetState, widget.scrollController),
         ],
@@ -81,8 +89,10 @@ class _StickerThumbState extends State<StickerThumb> {
       // thumbnail.type == currentStickerType ? isThumbnailSelected = true : false
       bool isThumbnailSelected = thumbnail.type == widget.currentStickerType;
 
+      final screenSize = MediaQuery.of(context).size.width;
+
       return Padding(
-        padding: const EdgeInsets.only(right: 5),
+        padding: EdgeInsets.only(right: screenSize * 0.01),
         child: GestureDetector(
           onTap: () {
             modalSetState(() {

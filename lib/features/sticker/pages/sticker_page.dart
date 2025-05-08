@@ -49,7 +49,7 @@ Future<T?> stickerPicker<T>({
               // Khi mở cố định tại 40% màn hình
               initialChildSize: 0.4,
               // Kéo lên tối đa 85%
-              maxChildSize: 0.85,
+              maxChildSize: 0.8,
               // Kéo xuống tối đa 20%
               minChildSize: 0.2,
               expand: false,

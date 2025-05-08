@@ -5,6 +5,7 @@ Future<List<AssetEntity>> loadMedia() async {
   // Yêu cầu quyền truy cập
   final PermissionState ps = await PhotoManager.requestPermissionExtend();
 
+  // Nếu đã từ chối cấp quyền, mở setting
   if (!ps.isAuth) {
     await PhotoManager.openSetting();
     return [];
@@ -24,12 +25,13 @@ Future<List<AssetEntity>> loadMedia() async {
     ),
   );
 
+  // Nếu album rỗng, trả rỗng
   if (albums.isEmpty) {
     debugPrint('Không tìm thấy album nào.');
     return [];
   }
 
-  // Lấy danh sách ảnh trong album đầu tiên (mới nhất)
+  // Lấy danh sách ảnh trong album
   final AssetPathEntity recentAlbum = albums.first;
 
   final int totalPhoto = await recentAlbum.assetCountAsync;
@@ -39,7 +41,7 @@ Future<List<AssetEntity>> loadMedia() async {
     end: totalPhoto, // Lấy toàn bộ ảnh
   );
 
-  debugPrint('Tìm thấy ${images.length} ảnh');
+  debugPrint('Have $totalPhoto photo');
 
   return images;
 }

@@ -82,12 +82,7 @@ class _ChatBodyState extends State<ChatBody> {
       padding: const EdgeInsets.all(10),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () {
-              customStickerUploader(context: context);
-            },
-            child: Icon(Icons.add_circle, size: 30),
-          ),
+          Icon(Icons.add_circle, size: 30),
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(

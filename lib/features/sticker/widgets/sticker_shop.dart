@@ -39,7 +39,7 @@ class _StickerShopState extends State<StickerShop> {
         });
         _buildShopStickerUI(widget.scrollController);
       },
-      child: Icon(Icons.add_reaction_outlined, size: 25),
+      child: Icon(Icons.add_shopping_cart, size: 25),
     );
   }
 

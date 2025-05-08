@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:sticker_app/core/utils/media_picker.dart';
@@ -35,16 +34,15 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
               StateSetter modalSetState,
             ) {
               return DraggableScrollableSheet(
-                initialChildSize: 0.5,
-                maxChildSize: 0.8,
-                minChildSize: 0.2,
+                initialChildSize: 0.85,
+                maxChildSize: 0.85,
                 expand: false,
                 builder: (context, scrollController) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text(
-                        'Recents',
+                        'All Photo',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -66,8 +64,8 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
                           itemCount: images.length,
                           itemBuilder: (BuildContext context, int index) {
                             return FutureBuilder<File?>(
-                              future:
-                                  images[index].file, // Lấy file từ AssetEntity
+                              // Lấy file từ AssetEntity
+                              future: images[index].file,
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                         ConnectionState.done &&
