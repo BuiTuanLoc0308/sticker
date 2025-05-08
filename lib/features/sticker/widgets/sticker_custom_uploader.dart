@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 Future<T?> customStickerUploader<T>({required BuildContext context}) async {
   FocusScope.of(context).unfocus();
-
   final screenSize = MediaQuery.of(context).size.width;
 
   final result = await showModalBottomSheet<T>(
@@ -22,7 +22,7 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
           BuildContext statefulBuilderContext,
           StateSetter modalSetState,
         ) {
-          // _loadImage();
+          _loadImage();
 
           return DraggableScrollableSheet(
             initialChildSize: 0.85,
@@ -65,16 +65,16 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
   return result;
 }
 
-// Future _loadImage() async {
-//   final PermissionState ps = await PhotoManager.requestPermissionExtend();
+Future _loadImage() async {
+  final PermissionState ps = await PhotoManager.requestPermissionExtend();
 
-//   List<AssetPathEntity> albums = [];
+  List<AssetPathEntity> albums = [];
 
-//   if (ps.isAuth) {
-//     albums = await PhotoManager.getAssetPathList(type: RequestType.image);
-//   } else {
-//     PhotoManager.openSetting();
-//   }
+  if (ps.isAuth) {
+    albums = await PhotoManager.getAssetPathList(type: RequestType.image);
+  } else {
+    PhotoManager.openSetting();
+  }
 
-//   return albums;
-// }
+  return albums;
+}
