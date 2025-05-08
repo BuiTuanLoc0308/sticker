@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:sticker_app/core/utils/media_picker.dart';
 
 Future<T?> customStickerUploader<T>({required BuildContext context}) async {
   FocusScope.of(context).unfocus();
@@ -20,7 +21,7 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
     context: context,
     builder: (BuildContext modalContext) {
       return FutureBuilder<List<AssetEntity>>(
-        future: _loadImage(),
+        future: loadMedia(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -106,45 +107,4 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
   );
 
   return result;
-}
-
-Future<List<AssetEntity>> _loadImage() async {
-  // Yêu cầu quyền truy cập
-  final PermissionState ps = await PhotoManager.requestPermissionExtend();
-
-  if (!ps.isAuth) {
-    await PhotoManager.openSetting();
-    return [];
-  }
-
-  // Xóa cache phòng trường hợp dữ liệu cũ
-  await PhotoManager.clearFileCache();
-
-  // Lấy danh sách album ảnh
-  final List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
-    type: RequestType.image,
-    filterOption: FilterOptionGroup(
-      imageOption: const FilterOption(
-        sizeConstraint: SizeConstraint(ignoreSize: true),
-      ),
-      orders: [const OrderOption(type: OrderOptionType.createDate, asc: false)],
-    ),
-  );
-
-  if (albums.isEmpty) {
-    debugPrint('Không tìm thấy album nào.');
-    return [];
-  }
-
-  // Lấy danh sách ảnh trong album đầu tiên (mới nhất)
-  final AssetPathEntity recentAlbum = albums.first;
-
-  final List<AssetEntity> images = await recentAlbum.getAssetListRange(
-    start: 0,
-    end: 20, // Số lượng ảnh muốn lấy
-  );
-
-  debugPrint('Tìm thấy ${images.length} ảnh');
-
-  return images;
 }
