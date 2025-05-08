@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:sticker_app/services/grant_permission.dart';
 
-Future<List<AssetPathEntity>> fecthAlbums() async {
+Future<List<AssetPathEntity>> fetchAlbums() async {
   try {
     await grantPermission();
 
@@ -10,7 +10,7 @@ Future<List<AssetPathEntity>> fecthAlbums() async {
 
     return albums;
   } catch (e) {
-    debugPrint('Error fecth albums: $e');
+    debugPrint('Error fetch albums: $e');
 
     return [];
   }

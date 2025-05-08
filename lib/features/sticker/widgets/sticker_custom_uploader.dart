@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:photo_manager/photo_manager.dart';
 
 Future<T?> customStickerUploader<T>({required BuildContext context}) async {
   FocusScope.of(context).unfocus();
