@@ -31,6 +31,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
+  http: ^1.4.0
   my_stickers:
     path: ../library/my_stickers_library
   photo_manager: ^3.6.4

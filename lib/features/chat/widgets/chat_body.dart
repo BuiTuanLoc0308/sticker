@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:my_stickers/data/models/sticker.dart';
 import 'package:my_stickers/data/stickers_data.dart';
 import 'package:sticker_app/features/sticker/pages/sticker_page.dart';
-import 'package:sticker_app/features/sticker/widgets/sticker_custom_uploader.dart';
 
 class ChatBody extends StatefulWidget {
   const ChatBody({super.key});
