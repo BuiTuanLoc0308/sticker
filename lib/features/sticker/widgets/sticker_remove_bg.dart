@@ -58,8 +58,7 @@ void imageOverlay(BuildContext context, File imageFile) {
                         child: ElevatedButton.icon(
                           onPressed: () async {
                             if (isCutDone) {
-                              // Lưu sticker vô nhóm sticker riêng
-                              hideImage();
+                              // hideImage();
                             } else {
                               setState(() {
                                 isLoading = true;
