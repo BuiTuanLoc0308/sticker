@@ -27,18 +27,20 @@ Future<List<AssetEntity>> loadMedia() async {
 
   // Nếu album rỗng, trả rỗng
   if (albums.isEmpty) {
-    debugPrint('Không tìm thấy album nào.');
+    debugPrint('Không tìm thấy album nào');
     return [];
   }
 
   // Lấy danh sách ảnh trong album
   final AssetPathEntity recentAlbum = albums.first;
 
+  // Lấy tổng số lượng ảnh
   final int totalPhoto = await recentAlbum.assetCountAsync;
 
+  // Lấy toàn bộ ảnh từ thư viện hình ảnh của điện thoại
   final List<AssetEntity> images = await recentAlbum.getAssetListRange(
     start: 0,
-    end: totalPhoto, // Lấy toàn bộ ảnh
+    end: totalPhoto,
   );
 
   debugPrint('Have $totalPhoto photo');

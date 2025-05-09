@@ -4,11 +4,12 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:sticker_app/core/utils/media_picker.dart';
 import 'package:sticker_app/features/sticker/widgets/sticker_remove_bg.dart';
 
-Future<T?> customStickerUploader<T>({required BuildContext context}) async {
+void customStickerUploader<T>({required BuildContext context}) async {
   FocusScope.of(context).unfocus();
+
   final screenSize = MediaQuery.of(context).size.width;
 
-  final result = await showModalBottomSheet<T>(
+  showModalBottomSheet<T>(
     barrierColor: Colors.transparent,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
@@ -24,10 +25,15 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
         future: loadMedia(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
+            // Hiện loading nếu chưa load xong
             return const Center(child: CircularProgressIndicator());
           }
 
           final images = snapshot.data!;
+          // Nếu không có hình nào
+          if (images.isEmpty) {
+            return const Center(child: Text('Không có hình ảnh nào'));
+          }
 
           return StatefulBuilder(
             builder: (
@@ -42,11 +48,14 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text(
-                        'All Photo',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: EdgeInsets.only(top: screenSize * 0.02),
+                        child: const Text(
+                          'All Photo',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       Padding(
@@ -67,7 +76,12 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
                             return FutureBuilder<File?>(
                               // Lấy file từ AssetEntity
                               future: images[index].file,
+                              // snapshot chứa trạng thái và dữ-
+                              // -liệu (nếu có) từ Future
                               builder: (context, snapshot) {
+                                // Kiểm tra snapshot.connectionState và-
+                                // -snapshot.hasData để biết Future đã hoàn-
+                                // -thành chưa và có dữ liệu hay không
                                 if (snapshot.connectionState ==
                                         ConnectionState.done &&
                                     snapshot.hasData &&
@@ -89,9 +103,7 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
                                   );
                                 } else {
                                   return const Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1,
-                                    ),
+                                    child: CircularProgressIndicator(),
                                   );
                                 }
                               },
@@ -109,6 +121,4 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
       );
     },
   );
-
-  return result;
 }

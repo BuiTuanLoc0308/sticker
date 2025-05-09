@@ -84,7 +84,10 @@ Future<T?> stickerShopDetail<T>({
                             borderRadius: BorderRadius.circular(10),
                           ),
                           color: Colors.blue,
-                          onPressed: () {},
+                          onPressed: () {
+                            // Biến các sticker này isPro = false và-
+                            // đưa vào chung với nhóm sticker đó
+                          },
                           child: Text(
                             'Add to Library',
                             style: TextStyle(fontSize: 20),

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class RemoveBgService {
+  // Lấy key từ removebg
   static const _apiKey = 'EYruSa3XHLKDCMsjszK5opP7';
 
   static Future<File?> removeBackground(File imageFile) async {

@@ -19,7 +19,7 @@ class _ChatBodyState extends State<ChatBody> {
   Map<String, List<Sticker>> allStickerPro = MyStickers.getStickerPro();
   // Kiểm tra xem Recents có được chọn hay không
   bool isRecentSelected = false;
-  // Số lượng thumbnail hiển thị
+  // Danh sách thumbnail
   List<Sticker> thumbList = MyStickers.getStickerThumb();
   // Lấy type Sticker của Sticker hiện tại
   String currentStickerType = '';
@@ -121,7 +121,7 @@ class _ChatBodyState extends State<ChatBody> {
             // Tránh tự động mở bàn phím
             _focusNode.unfocus();
 
-            await stickerPicker(
+            stickerPicker(
               context: context,
               allStickerPro: allStickerPro,
               isRecentSelected: isRecentSelected,

@@ -122,7 +122,7 @@ class _StickerShopState extends State<StickerShop> {
                 final String stickerType = entry.key;
                 // Lấy value là tất cả các Sticker
                 final List<Sticker> stickers = entry.value.take(5).toList();
-
+                // Nếu sticker rỗng, trả rỗng
                 return stickers.isNotEmpty
                     ? [
                       StickerShowType(

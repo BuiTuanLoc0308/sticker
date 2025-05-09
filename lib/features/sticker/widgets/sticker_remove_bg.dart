@@ -8,8 +8,10 @@ void imageOverlay(BuildContext context, File imageFile) {
   final screenSize = MediaQuery.of(context).size.width;
 
   late void Function(void Function()) setState;
+
   bool isLoading = false;
   bool isCutDone = false;
+
   File? displayedImage = imageFile;
 
   _imgOverlay = OverlayEntry(
@@ -19,6 +21,7 @@ void imageOverlay(BuildContext context, File imageFile) {
           setState = setStateOverlay;
           return Stack(
             children: [
+              // Cho nền đằng sau màu đen
               Container(color: Colors.black),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -27,11 +30,8 @@ void imageOverlay(BuildContext context, File imageFile) {
                     child:
                         isLoading
                             ? const Center(child: CircularProgressIndicator())
-                            : Image.file(
-                              displayedImage!,
-                              width: screenSize,
-                              height: screenSize,
-                            ),
+                            // Hiện ảnh mình ấn vào
+                            : Image.file(displayedImage!),
                   ),
                   Row(
                     children: [
@@ -64,21 +64,24 @@ void imageOverlay(BuildContext context, File imageFile) {
                                 isLoading = true;
                               });
 
-                              final result =
+                              final removedBg =
                                   await RemoveBgService.removeBackground(
                                     imageFile,
                                   );
 
-                              if (result != null) {
+                              if (removedBg != null) {
                                 setState(() {
                                   isLoading = false;
                                   isCutDone = true;
-                                  displayedImage = result;
+                                  // Hiện ảnh đã được xóa background
+                                  displayedImage = removedBg;
                                 });
                               } else {
                                 setState(() {
                                   isLoading = false;
+                                  debugPrint('Fail to cut');
                                 });
+                                Navigator.pop(context);
                               }
                             }
                           },

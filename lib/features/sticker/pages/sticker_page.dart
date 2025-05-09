@@ -4,7 +4,7 @@ import 'package:sticker_app/features/sticker/widgets/sticker_filtered.dart';
 import 'package:sticker_app/features/sticker/widgets/sticker_search.dart';
 import 'package:sticker_app/features/sticker/widgets/sticker_thumb.dart';
 
-Future<T?> stickerPicker<T>({
+void stickerPicker<T>({
   required BuildContext context,
   required Map<String, List<Sticker>> allStickerPro,
   required bool isRecentSelected,
@@ -19,7 +19,7 @@ Future<T?> stickerPicker<T>({
 
   final screenSize = MediaQuery.of(context).size.width;
 
-  final result = await showModalBottomSheet<T>(
+  showModalBottomSheet<T>(
     // Không làm mờ đằng sau modal
     barrierColor: Colors.transparent,
     // Bo tròn góc
@@ -113,6 +113,4 @@ Future<T?> stickerPicker<T>({
       );
     },
   );
-
-  return result;
 }

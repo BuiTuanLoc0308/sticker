@@ -4,6 +4,7 @@ void updateThumbnailSticker({
   required List<Sticker> stickerThumb,
   required String stickerType,
 }) {
+  // Tìm thumb đó trên thanh thumb bar
   final Sticker thumb = stickerThumb.firstWhere(
     (sticker) => sticker.type == stickerType,
   );
