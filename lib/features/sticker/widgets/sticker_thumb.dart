@@ -6,16 +6,6 @@ import 'package:sticker_app/features/sticker/widgets/sticker_shop.dart';
 
 // ignore: must_be_immutable
 class StickerThumb extends StatefulWidget {
-  StateSetter modalSetState;
-  ScrollController scrollController;
-  Map<String, List<Sticker>> allStickerPro;
-  bool isRecentSelected;
-  List<Sticker> thumbList;
-  String currentStickerType;
-  List<Sticker> recentsStickerList;
-  List<Sticker> chatContentList;
-  Function(String) onStickerTypeChanged;
-
   StickerThumb({
     super.key,
     required this.modalSetState,
@@ -29,6 +19,16 @@ class StickerThumb extends StatefulWidget {
     required this.onStickerTypeChanged,
   });
 
+  StateSetter modalSetState;
+  ScrollController scrollController;
+  Map<String, List<Sticker>> allStickerPro;
+  bool isRecentSelected;
+  List<Sticker> thumbList;
+  String currentStickerType;
+  List<Sticker> recentsStickerList;
+  List<Sticker> chatContentList;
+  Function(String) onStickerTypeChanged;
+
   @override
   State<StickerThumb> createState() => _StickerThumbState();
 }
@@ -36,12 +36,12 @@ class StickerThumb extends StatefulWidget {
 class _StickerThumbState extends State<StickerThumb> {
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size.width;
+    final double screenSize = MediaQuery.of(context).size.width;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: [
+        children: <Widget>[
           // Tạo thumb cho shop Sticker
           StickerShop(
             modalSetState: widget.modalSetState,
@@ -57,7 +57,7 @@ class _StickerThumbState extends State<StickerThumb> {
               left: screenSize * 0.04,
               right: screenSize * 0.02,
             ),
-            child: StickerAdd(),
+            child: const StickerAdd(),
           ),
           // Tạo thumbnail cho recents Sticker
           StickerRecent(
@@ -65,7 +65,7 @@ class _StickerThumbState extends State<StickerThumb> {
             modalSetState: widget.modalSetState,
             currentStickerType: widget.currentStickerType,
             scrollController: widget.scrollController,
-            onStickerTypeChanged: (newType) {
+            onStickerTypeChanged: (String newType) {
               widget.modalSetState(() {
                 widget.onStickerTypeChanged(newType);
               });
@@ -84,12 +84,12 @@ class _StickerThumbState extends State<StickerThumb> {
     ScrollController scrollController,
   ) {
     // Lấy thumbnail hiện lên giao diện
-    return List.generate(widget.thumbList.length, (index) {
+    return List<Widget>.generate(widget.thumbList.length, (int index) {
       Sticker thumbnail = widget.thumbList[index];
       // thumbnail.type == currentStickerType ? isThumbnailSelected = true : false
       bool isThumbnailSelected = thumbnail.type == widget.currentStickerType;
 
-      final screenSize = MediaQuery.of(context).size.width;
+      final double screenSize = MediaQuery.of(context).size.width;
 
       return Padding(
         padding: EdgeInsets.only(right: screenSize * 0.01),
@@ -101,7 +101,7 @@ class _StickerThumbState extends State<StickerThumb> {
             });
           },
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 0),
+            duration: const Duration(),
             width: 45,
             height: 45,
             padding: const EdgeInsets.all(3),

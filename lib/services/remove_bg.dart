@@ -1,12 +1,14 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
 class RemoveBgService {
-  // Lấy key từ removebg
-  static const _apiKey = 'EYruSa3XHLKDCMsjszK5opP7';
+  const RemoveBgService._();
+
+  static const String _apiKey = 'EYruSa3XHLKDCMsjszK5opP7';
 
   static Future<File?> removeBackground(File imageFile) async {
-    final request =
+    final http.MultipartRequest request =
         http.MultipartRequest(
             'POST',
             Uri.parse('https://api.remove.bg/v1.0/removebg'),
@@ -17,11 +19,11 @@ class RemoveBgService {
           )
           ..fields['size'] = 'auto';
 
-    final response = await request.send();
+    final http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      final bytes = await response.stream.toBytes();
-      final file = File('${imageFile.path}_no_bg.png');
+      final Uint8List bytes = await response.stream.toBytes();
+      final File file = File('${imageFile.path}_no_bg.png');
       await file.writeAsBytes(bytes);
       return file;
     } else {

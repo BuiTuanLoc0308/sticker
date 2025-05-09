@@ -8,7 +8,7 @@ Future<List<AssetEntity>> loadMedia() async {
   // Nếu đã từ chối cấp quyền, mở setting
   if (!ps.isAuth) {
     await PhotoManager.openSetting();
-    return [];
+    return <AssetEntity>[];
   }
 
   // Xóa cache phòng trường hợp dữ liệu cũ
@@ -21,14 +21,14 @@ Future<List<AssetEntity>> loadMedia() async {
       imageOption: const FilterOption(
         sizeConstraint: SizeConstraint(ignoreSize: true),
       ),
-      orders: [const OrderOption(type: OrderOptionType.createDate, asc: false)],
+      orders: <OrderOption>[const OrderOption()],
     ),
   );
 
   // Nếu album rỗng, trả rỗng
   if (albums.isEmpty) {
     debugPrint('Không tìm thấy album nào');
-    return [];
+    return <AssetEntity>[];
   }
 
   // Lấy danh sách ảnh trong album

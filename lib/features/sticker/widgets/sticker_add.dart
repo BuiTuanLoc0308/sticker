@@ -12,7 +12,7 @@ class StickerAdd extends StatelessWidget {
 
         customStickerUploader(context: context);
       },
-      child: Icon(Icons.add_reaction_outlined, size: 25),
+      child: const Icon(Icons.add_reaction_outlined, size: 25),
     );
   }
 }

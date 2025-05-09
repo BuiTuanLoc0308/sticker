@@ -4,16 +4,6 @@ import 'package:sticker_app/core/utils/thumb_update.dart';
 
 // ignore: must_be_immutable
 class StickerShowType extends StatefulWidget {
-  StateSetter modalSetState;
-  ScrollController scrollController;
-  String stickerType;
-  int stickerCount;
-  bool showCount;
-  bool isRecentSelected;
-  List<Sticker> thumbList;
-  Function(String) onStickerTypeChanged;
-  bool isViewOnly;
-
   StickerShowType({
     super.key,
     required this.modalSetState,
@@ -26,6 +16,16 @@ class StickerShowType extends StatefulWidget {
     required this.onStickerTypeChanged,
     required this.isViewOnly,
   });
+
+  StateSetter modalSetState;
+  ScrollController scrollController;
+  String stickerType;
+  int stickerCount;
+  bool showCount;
+  bool isRecentSelected;
+  List<Sticker> thumbList;
+  Function(String) onStickerTypeChanged;
+  bool isViewOnly;
 
   @override
   State<StickerShowType> createState() => _StickerShowTypeState();
@@ -72,10 +72,13 @@ class _StickerShowTypeState extends State<StickerShowType> {
                     style: const TextStyle(fontSize: 20),
                   )
                   : Row(
-                    children: [
-                      Text(widget.stickerType, style: TextStyle(fontSize: 20)),
+                    children: <Widget>[
+                      Text(
+                        widget.stickerType,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                       if (!widget.isViewOnly && widget.stickerType != 'Recents')
-                        Icon(Icons.chevron_right),
+                        const Icon(Icons.chevron_right),
                     ],
                   ),
         ),

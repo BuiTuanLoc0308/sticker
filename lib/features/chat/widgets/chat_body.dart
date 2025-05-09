@@ -14,7 +14,7 @@ class _ChatBodyState extends State<ChatBody> {
   // Dùng để loại bỏ tự động mở bàn phím
   final FocusNode _focusNode = FocusNode();
   // Lưu nội dung sticker vào chat
-  List<Sticker> chatContentList = [];
+  List<Sticker> chatContentList = <Sticker>[];
   // Danh sách các Sticker Pro
   Map<String, List<Sticker>> allStickerPro = MyStickers.getStickerPro();
   // Kiểm tra xem Recents có được chọn hay không
@@ -24,9 +24,9 @@ class _ChatBodyState extends State<ChatBody> {
   // Lấy type Sticker của Sticker hiện tại
   String currentStickerType = '';
   // Để lưu Sticker đuọc chọn gần đây
-  List<Sticker> recentsStickerList = [];
+  List<Sticker> recentsStickerList = <Sticker>[];
   // Tạo danh sách tất cả Sticker
-  Map<String, List<Sticker>> allStickerList = {};
+  Map<String, List<Sticker>> allStickerList = <String, List<Sticker>>{};
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _ChatBodyState extends State<ChatBody> {
     // -là type của sticker vị trí đầu trong thumbnail
     currentStickerType = thumbList.first.type;
     // Đưa Recents và các Sticker của Recents vào allSticker
-    allStickerList = {
+    allStickerList = <String, List<Sticker>>{
       'Recents': recentsStickerList,
       ...MyStickers.getAllSticker(),
     };
@@ -44,7 +44,7 @@ class _ChatBodyState extends State<ChatBody> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         Expanded(child: _chatContentList()),
         _buildBottomChatUI(context),
       ],
@@ -52,12 +52,12 @@ class _ChatBodyState extends State<ChatBody> {
   }
 
   Widget _chatContentList() {
-    final screenSize = MediaQuery.of(context).size.width;
+    final double screenSize = MediaQuery.of(context).size.width;
 
     return ListView.builder(
       reverse: true,
       itemCount: chatContentList.length,
-      itemBuilder: (context, index) {
+      itemBuilder: (BuildContext context, int index) {
         return Padding(
           padding: EdgeInsets.all(screenSize * 0.01),
           child: Align(
@@ -75,13 +75,13 @@ class _ChatBodyState extends State<ChatBody> {
   }
 
   Widget _buildBottomChatUI(BuildContext chatBodyContext) {
-    final screenSize = MediaQuery.of(context).size.width;
+    final double screenSize = MediaQuery.of(context).size.width;
 
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Row(
-        children: [
-          Icon(Icons.add_circle, size: 30),
+        children: <Widget>[
+          const Icon(Icons.add_circle, size: 30),
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(
@@ -91,7 +91,7 @@ class _ChatBodyState extends State<ChatBody> {
               child: _textChatInputField(chatBodyContext),
             ),
           ),
-          Icon(Icons.thumb_up, size: 30),
+          const Icon(Icons.thumb_up, size: 30),
         ],
       ),
     );
@@ -100,8 +100,7 @@ class _ChatBodyState extends State<ChatBody> {
   Widget _textChatInputField(BuildContext context) {
     return TextFormField(
       focusNode: _focusNode,
-      autofocus: false,
-      onTapOutside: (event) {
+      onTapOutside: (PointerDownEvent event) {
         // Tắt bàn phím khi ấn ra ngoài
         FocusScope.of(context).unfocus();
       },
@@ -111,10 +110,7 @@ class _ChatBodyState extends State<ChatBody> {
         contentPadding: EdgeInsets.only(
           left: MediaQuery.of(context).size.width * 0.04,
         ),
-        border: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black),
-          borderRadius: BorderRadius.circular(30),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
         hintText: 'Aa',
         suffixIcon: GestureDetector(
           onTap: () async {
@@ -130,7 +126,7 @@ class _ChatBodyState extends State<ChatBody> {
               recentsStickerList: recentsStickerList,
               chatContentList: chatContentList,
               allStickerList: allStickerList,
-              onStickerTypeChanged: (newType) {
+              onStickerTypeChanged: (String newType) {
                 setState(() {
                   currentStickerType = newType;
                   isRecentSelected = newType == 'Recents';

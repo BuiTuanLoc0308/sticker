@@ -2,12 +2,6 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class StickerRecent extends StatefulWidget {
-  bool isRecentSelected;
-  StateSetter modalSetState;
-  String currentStickerType;
-  ScrollController scrollController;
-  Function(String) onStickerTypeChanged;
-
   StickerRecent({
     super.key,
     required this.isRecentSelected,
@@ -16,6 +10,12 @@ class StickerRecent extends StatefulWidget {
     required this.scrollController,
     required this.onStickerTypeChanged,
   });
+
+  bool isRecentSelected;
+  StateSetter modalSetState;
+  String currentStickerType;
+  ScrollController scrollController;
+  Function(String) onStickerTypeChanged;
 
   @override
   State<StickerRecent> createState() => _StickerRecentState();
@@ -35,7 +35,7 @@ class _StickerRecentState extends State<StickerRecent> {
         });
       },
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 0),
+        duration: const Duration(),
         width: 45,
         height: 45,
         decoration: BoxDecoration(
@@ -45,7 +45,7 @@ class _StickerRecentState extends State<StickerRecent> {
                   : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
         ),
-        child: Icon(Icons.access_time),
+        child: const Icon(Icons.access_time),
       ),
     );
   }

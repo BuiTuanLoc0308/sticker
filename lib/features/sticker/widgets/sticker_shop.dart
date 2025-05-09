@@ -6,14 +6,6 @@ import 'package:sticker_app/features/sticker/widgets/sticker_show_type.dart';
 
 // ignore: must_be_immutable
 class StickerShop extends StatefulWidget {
-  StateSetter modalSetState;
-  ScrollController scrollController;
-  Map<String, List<Sticker>> allStickerPro;
-  bool isRecentSelected;
-  List<Sticker> thumbList;
-  List<Sticker> recentsStickerList;
-  List<Sticker> chatContentList;
-
   StickerShop({
     super.key,
     required this.modalSetState,
@@ -24,6 +16,13 @@ class StickerShop extends StatefulWidget {
     required this.recentsStickerList,
     required this.chatContentList,
   });
+  StateSetter modalSetState;
+  ScrollController scrollController;
+  Map<String, List<Sticker>> allStickerPro;
+  bool isRecentSelected;
+  List<Sticker> thumbList;
+  List<Sticker> recentsStickerList;
+  List<Sticker> chatContentList;
 
   @override
   State<StickerShop> createState() => _StickerShopState();
@@ -39,7 +38,7 @@ class _StickerShopState extends State<StickerShop> {
         });
         _buildShopStickerUI(widget.scrollController);
       },
-      child: Icon(Icons.add_shopping_cart, size: 25),
+      child: const Icon(Icons.add_shopping_cart, size: 25),
     );
   }
 
@@ -50,7 +49,7 @@ class _StickerShopState extends State<StickerShop> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
         // Màu viền
-        side: BorderSide(color: Colors.black, width: 0.5),
+        side: const BorderSide(width: 0.5),
       ),
       isScrollControlled: true,
       context: context,
@@ -65,7 +64,7 @@ class _StickerShopState extends State<StickerShop> {
                 MediaQuery.of(context).size.height * 0.015,
               ),
               child: Column(
-                children: [
+                children: <Widget>[
                   _topShopStickerUI(modalContext),
                   Expanded(
                     child: _shopStickerList(modalSetState, scrollController),
@@ -80,10 +79,10 @@ class _StickerShopState extends State<StickerShop> {
   }
 
   Widget _topShopStickerUI(BuildContext modalContext) {
-    final screenSize = MediaQuery.of(context).size.height;
+    final double screenSize = MediaQuery.of(context).size.height;
 
     return Row(
-      children: [
+      children: <Widget>[
         Flexible(
           child: Padding(
             padding: EdgeInsets.only(
@@ -91,7 +90,7 @@ class _StickerShopState extends State<StickerShop> {
               bottom: screenSize * 0.005,
               right: screenSize * 0.01,
             ),
-            child: StickerSearch(),
+            child: const StickerSearch(),
           ),
         ),
         GestureDetector(
@@ -99,7 +98,7 @@ class _StickerShopState extends State<StickerShop> {
             // Đóng modal khi nhấn Done
             Navigator.pop(modalContext);
           },
-          child: Text(
+          child: const Text(
             'Done',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
@@ -116,15 +115,18 @@ class _StickerShopState extends State<StickerShop> {
       controller: scrollController,
       slivers:
           widget.allStickerPro.entries
-              .where((entry) => entry.key != 'Recents')
-              .expand((entry) {
+              .where(
+                (MapEntry<String, List<Sticker>> entry) =>
+                    entry.key != 'Recents',
+              )
+              .expand((MapEntry<String, List<Sticker>> entry) {
                 // Lấy key là loại của Sticker
                 final String stickerType = entry.key;
                 // Lấy value là tất cả các Sticker
                 final List<Sticker> stickers = entry.value.take(5).toList();
                 // Nếu sticker rỗng, trả rỗng
                 return stickers.isNotEmpty
-                    ? [
+                    ? <StatefulWidget>[
                       StickerShowType(
                         modalSetState: modalSetState,
                         scrollController: scrollController,
@@ -148,7 +150,7 @@ class _StickerShopState extends State<StickerShop> {
                         allStickerPro: widget.allStickerPro,
                       ),
                     ]
-                    : [];
+                    : <Widget>[];
               })
               .cast<Widget>()
               .toList(),

@@ -5,17 +5,6 @@ import 'package:sticker_app/features/sticker/widgets/sticker_show_type.dart';
 
 // ignore: must_be_immutable
 class StickerFiltered extends StatefulWidget {
-  String currentStickerType;
-  Map<String, List<Sticker>> allStickerList;
-  ScrollController scrollController;
-  StateSetter modalSetState;
-  bool isRecentSelected;
-  List<Sticker> thumbList;
-  List<Sticker> recentsStickerList;
-  List<Sticker> chatContentList;
-  Map<String, List<Sticker>> allStickerPro;
-  Function(String) onStickerTypeChanged;
-
   StickerFiltered({
     super.key,
     required this.currentStickerType,
@@ -30,6 +19,17 @@ class StickerFiltered extends StatefulWidget {
     required this.onStickerTypeChanged,
   });
 
+  String currentStickerType;
+  Map<String, List<Sticker>> allStickerList;
+  ScrollController scrollController;
+  StateSetter modalSetState;
+  bool isRecentSelected;
+  List<Sticker> thumbList;
+  List<Sticker> recentsStickerList;
+  List<Sticker> chatContentList;
+  Map<String, List<Sticker>> allStickerPro;
+  Function(String) onStickerTypeChanged;
+
   @override
   State<StickerFiltered> createState() => _StickerFilteredState();
 }
@@ -39,12 +39,13 @@ class _StickerFilteredState extends State<StickerFiltered> {
   Widget build(BuildContext context) {
     final Map<String, List<Sticker>> filteredStickers =
         (widget.currentStickerType == 'Recents')
-            // Chỉ lấy 5 loại Sticker để hiện ở phần Recents
-            ? Map.fromEntries(widget.allStickerList.entries.take(5))
-            // Chỉ lấy 1 loại Sticker theo currentStickerType
-            : {
+            ? Map<String, List<Sticker>>.fromEntries(
+              widget.allStickerList.entries.take(5),
+            )
+            : <String, List<Sticker>>{
               widget.currentStickerType:
-                  widget.allStickerList[widget.currentStickerType] ?? [],
+                  widget.allStickerList[widget.currentStickerType] ??
+                  <Sticker>[],
             };
 
     return Expanded(
@@ -52,7 +53,7 @@ class _StickerFilteredState extends State<StickerFiltered> {
         controller: widget.scrollController,
         slivers:
             filteredStickers.entries
-                .expand((entry) {
+                .expand((MapEntry<String, List<Sticker>> entry) {
                   // Lấy key là loại của Sticker
                   final String stickerType = entry.key;
                   // Lấy value là tất cả các Sticker
@@ -62,7 +63,7 @@ class _StickerFilteredState extends State<StickerFiltered> {
                           : entry.value;
 
                   return stickers.isNotEmpty
-                      ? [
+                      ? <StatefulWidget>[
                         StickerShowType(
                           modalSetState: widget.modalSetState,
                           scrollController: widget.scrollController,
@@ -75,7 +76,7 @@ class _StickerFilteredState extends State<StickerFiltered> {
                                   : true,
                           isRecentSelected: widget.isRecentSelected,
                           thumbList: widget.thumbList,
-                          onStickerTypeChanged: (newType) {
+                          onStickerTypeChanged: (String newType) {
                             setState(() {
                               widget.currentStickerType = newType;
                               widget.isRecentSelected = newType == 'Recents';
@@ -98,7 +99,7 @@ class _StickerFilteredState extends State<StickerFiltered> {
                           allStickerPro: widget.allStickerPro,
                         ),
                       ]
-                      : [];
+                      : <Widget>[];
                 })
                 .cast<Widget>()
                 .toList(),

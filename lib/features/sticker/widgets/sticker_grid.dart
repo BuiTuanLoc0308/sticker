@@ -6,16 +6,6 @@ import 'package:sticker_app/features/sticker/widgets/sticker_shop_detail.dart';
 
 // ignore: must_be_immutable
 class StickerGrid extends StatefulWidget {
-  List<Sticker> stickers;
-  String stickerType;
-  ScrollController scrollController;
-  bool isViewOnly = false;
-  bool isLocked = false;
-  List<Sticker> thumbList;
-  List<Sticker> recentsStickerList;
-  List<Sticker> chatContentList;
-  Map<String, List<Sticker>> allStickerPro;
-
   StickerGrid({
     super.key,
     required this.stickers,
@@ -29,6 +19,16 @@ class StickerGrid extends StatefulWidget {
     required this.allStickerPro,
   });
 
+  List<Sticker> stickers;
+  String stickerType;
+  ScrollController scrollController;
+  bool isViewOnly = false;
+  bool isLocked = false;
+  List<Sticker> thumbList;
+  List<Sticker> recentsStickerList;
+  List<Sticker> chatContentList;
+  Map<String, List<Sticker>> allStickerPro;
+
   @override
   State<StickerGrid> createState() => _StickerGridState();
 }
@@ -37,8 +37,8 @@ class _StickerGridState extends State<StickerGrid> {
   @override
   Widget build(BuildContext context) {
     return SliverGrid(
-      delegate: SliverChildBuilderDelegate((context, index) {
-        final sticker = widget.stickers[index];
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        final Sticker sticker = widget.stickers[index];
         return GestureDetector(
           onLongPress: () => showStickerPreview(context, sticker),
           onTap:
@@ -55,12 +55,12 @@ class _StickerGridState extends State<StickerGrid> {
                           recentsStickerList: widget.recentsStickerList,
                           chatContentList: widget.chatContentList,
                         )
-                        : {
+                        : <void>{
                           Navigator.of(context).pop(),
                           // Nếu Sticker đã có trong Recents, xóa Sticker
                           setState(() {
                             widget.recentsStickerList.removeWhere(
-                              (s) => s.path == sticker.path,
+                              (Sticker s) => s.path == sticker.path,
                             );
                             // Thêm lại Sticker vào đầu danh sách
                             widget.recentsStickerList.insert(0, sticker);
@@ -83,9 +83,9 @@ class _StickerGridState extends State<StickerGrid> {
           child:
               sticker.isPro && widget.isLocked
                   ? Stack(
-                    children: [
+                    children: <Widget>[
                       Opacity(opacity: 0.5, child: Image.asset(sticker.path)),
-                      Center(child: Icon(Icons.lock, color: Colors.red)),
+                      const Center(child: Icon(Icons.lock, color: Colors.red)),
                     ],
                   )
                   : Image.asset(sticker.path),

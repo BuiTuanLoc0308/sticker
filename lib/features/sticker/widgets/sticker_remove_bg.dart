@@ -5,7 +5,7 @@ import 'package:sticker_app/services/remove_bg.dart';
 OverlayEntry? _imgOverlay;
 
 void imageOverlay(BuildContext context, File imageFile) {
-  final screenSize = MediaQuery.of(context).size.width;
+  final double screenSize = MediaQuery.of(context).size.width;
 
   late void Function(void Function()) setState;
 
@@ -15,17 +15,20 @@ void imageOverlay(BuildContext context, File imageFile) {
   File? displayedImage = imageFile;
 
   _imgOverlay = OverlayEntry(
-    builder: (overlayEntryContext) {
+    builder: (BuildContext overlayEntryContext) {
       return StatefulBuilder(
-        builder: (context, setStateOverlay) {
+        builder: (
+          BuildContext context,
+          void Function(void Function()) setStateOverlay,
+        ) {
           setState = setStateOverlay;
           return Stack(
-            children: [
+            children: <Widget>[
               // Cho nền đằng sau màu đen
               Container(color: Colors.black),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: <Widget>[
                   Expanded(
                     child:
                         isLoading
@@ -34,7 +37,7 @@ void imageOverlay(BuildContext context, File imageFile) {
                             : Image.file(displayedImage!),
                   ),
                   Row(
-                    children: [
+                    children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(right: screenSize * 0.02),
                         child: Container(
@@ -44,7 +47,7 @@ void imageOverlay(BuildContext context, File imageFile) {
                           ),
                           child: Padding(
                             padding: EdgeInsets.only(left: screenSize * 0.02),
-                            child: IconButton(
+                            child: const IconButton(
                               onPressed: hideImage,
                               icon: Icon(
                                 Icons.arrow_back_ios,
@@ -65,7 +68,7 @@ void imageOverlay(BuildContext context, File imageFile) {
                                 isLoading = true;
                               });
 
-                              final removedBg =
+                              final File? removedBg =
                                   await RemoveBgService.removeBackground(
                                     imageFile,
                                   );
@@ -102,7 +105,7 @@ void imageOverlay(BuildContext context, File imageFile) {
                             backgroundColor:
                                 isCutDone ? Colors.green : Colors.grey,
                             foregroundColor: Colors.white,
-                            textStyle: TextStyle(fontSize: 20),
+                            textStyle: const TextStyle(fontSize: 20),
                           ),
                         ),
                       ),

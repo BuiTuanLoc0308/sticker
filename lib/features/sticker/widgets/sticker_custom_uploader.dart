@@ -7,29 +7,32 @@ import 'package:sticker_app/features/sticker/widgets/sticker_remove_bg.dart';
 void customStickerUploader<T>({required BuildContext context}) async {
   FocusScope.of(context).unfocus();
 
-  final screenSize = MediaQuery.of(context).size.width;
+  final double screenSize = MediaQuery.of(context).size.width;
 
   showModalBottomSheet<T>(
     barrierColor: Colors.transparent,
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(10),
         topRight: Radius.circular(10),
       ),
-      side: BorderSide(color: Colors.black, width: 0.5),
+      side: BorderSide(width: 0.5),
     ),
     isScrollControlled: true,
     context: context,
     builder: (BuildContext modalContext) {
       return FutureBuilder<List<AssetEntity>>(
         future: loadMedia(),
-        builder: (context, snapshot) {
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<List<AssetEntity>> snapshot,
+        ) {
           if (!snapshot.hasData) {
             // Hiện loading nếu chưa load xong
             return const Center(child: CircularProgressIndicator());
           }
 
-          final images = snapshot.data!;
+          final List<AssetEntity> images = snapshot.data!;
           // Nếu không có hình nào
           if (images.isEmpty) {
             return const Center(child: Text('Không có hình ảnh nào'));
@@ -44,10 +47,12 @@ void customStickerUploader<T>({required BuildContext context}) async {
                 initialChildSize: 0.85,
                 maxChildSize: 0.85,
                 expand: false,
-                builder: (context, scrollController) {
+                builder: (
+                  BuildContext context,
+                  ScrollController scrollController,
+                ) {
                   return Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+                    children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(top: screenSize * 0.02),
                         child: const Text(
@@ -78,7 +83,10 @@ void customStickerUploader<T>({required BuildContext context}) async {
                               future: images[index].file,
                               // snapshot chứa trạng thái và dữ-
                               // -liệu (nếu có) từ Future
-                              builder: (context, snapshot) {
+                              builder: (
+                                BuildContext context,
+                                AsyncSnapshot<File?> snapshot,
+                              ) {
                                 // Kiểm tra snapshot.connectionState và-
                                 // -snapshot.hasData để biết Future đã hoàn-
                                 // -thành chưa và có dữ liệu hay không
@@ -92,7 +100,7 @@ void customStickerUploader<T>({required BuildContext context}) async {
                                       imageOverlay(context, snapshot.data!);
                                     },
                                     child: Container(
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                         color: Colors.white,
                                       ),
                                       child: Image.file(

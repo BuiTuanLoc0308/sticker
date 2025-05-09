@@ -11,15 +11,15 @@ Future<T?> stickerShopDetail<T>({
   required List<Sticker> recentsStickerList,
   required List<Sticker> chatContentList,
 }) {
-  final screenSize = MediaQuery.of(context).size.height;
+  final double screenSize = MediaQuery.of(context).size.height;
 
   return showModalBottomSheet<T>(
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(10),
         topRight: Radius.circular(10),
       ),
-      side: BorderSide(color: Colors.black, width: 0.5),
+      side: BorderSide(width: 0.5),
     ),
     isScrollControlled: true,
     context: context,
@@ -34,7 +34,7 @@ Future<T?> stickerShopDetail<T>({
             maxChildSize: 0.7,
             minChildSize: 0.2,
             expand: false,
-            builder: (context, scrollController) {
+            builder: (BuildContext context, ScrollController scrollController) {
               return Padding(
                 padding: EdgeInsets.only(
                   top: screenSize * 0.01,
@@ -43,14 +43,14 @@ Future<T?> stickerShopDetail<T>({
                 ),
                 child: CustomScrollView(
                   controller: scrollController,
-                  slivers: [
+                  slivers: <Widget>[
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: EdgeInsets.only(top: screenSize * 0.005),
                         child: Center(
                           child: Text(
                             '$stickerType Premium',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 25,
                               fontWeight: FontWeight.bold,
                             ),
@@ -61,7 +61,7 @@ Future<T?> stickerShopDetail<T>({
                     SliverPadding(
                       padding: EdgeInsets.all(screenSize * 0.01),
                       sliver: StickerGrid(
-                        stickers: allStickerPro[stickerType] ?? [],
+                        stickers: allStickerPro[stickerType] ?? <Sticker>[],
                         stickerType: stickerType,
                         scrollController: scrollController,
                         isViewOnly: true,
@@ -88,7 +88,7 @@ Future<T?> stickerShopDetail<T>({
                             // Biến các sticker này isPro = false và-
                             // đưa vào chung với nhóm sticker đó
                           },
-                          child: Text(
+                          child: const Text(
                             'Add to Library',
                             style: TextStyle(fontSize: 20),
                           ),

@@ -17,19 +17,19 @@ void stickerPicker<T>({
 }) async {
   FocusScope.of(context).unfocus();
 
-  final screenSize = MediaQuery.of(context).size.width;
+  final double screenSize = MediaQuery.of(context).size.width;
 
   showModalBottomSheet<T>(
     // Không làm mờ đằng sau modal
     barrierColor: Colors.transparent,
     // Bo tròn góc
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(10),
         topRight: Radius.circular(10),
       ),
       // Màu viền
-      side: BorderSide(color: Colors.black, width: 0.5),
+      side: BorderSide(width: 0.5),
     ),
     showDragHandle: true,
     isScrollControlled: true,
@@ -53,14 +53,17 @@ void stickerPicker<T>({
               // Kéo xuống tối đa 20%
               minChildSize: 0.2,
               expand: false,
-              builder: (context, scrollController) {
+              builder: (
+                BuildContext context,
+                ScrollController scrollController,
+              ) {
                 return Padding(
                   padding: EdgeInsets.only(
                     left: screenSize * 0.03,
                     right: screenSize * 0.03,
                   ),
                   child: Column(
-                    children: [
+                    children: <Widget>[
                       StickerThumb(
                         modalSetState: modalSetState,
                         scrollController: scrollController,
@@ -70,7 +73,7 @@ void stickerPicker<T>({
                         currentStickerType: currentStickerType,
                         recentsStickerList: recentsStickerList,
                         chatContentList: chatContentList,
-                        onStickerTypeChanged: (newType) {
+                        onStickerTypeChanged: (String newType) {
                           modalSetState(() {
                             currentStickerType = newType;
                             isRecentSelected = newType == 'Recents';
@@ -84,7 +87,7 @@ void stickerPicker<T>({
                           top: screenSize * 0.02,
                           bottom: screenSize * 0.01,
                         ),
-                        child: StickerSearch(),
+                        child: const StickerSearch(),
                       ),
                       StickerFiltered(
                         currentStickerType: currentStickerType,
@@ -96,7 +99,7 @@ void stickerPicker<T>({
                         recentsStickerList: recentsStickerList,
                         chatContentList: chatContentList,
                         allStickerPro: allStickerPro,
-                        onStickerTypeChanged: (newType) {
+                        onStickerTypeChanged: (String newType) {
                           modalSetState(() {
                             currentStickerType = newType;
                             isRecentSelected = newType == 'Recents';

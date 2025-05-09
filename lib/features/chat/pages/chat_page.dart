@@ -16,6 +16,6 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildUI(BuildContext buildContext) {
-    return Scaffold(appBar: chatAppBar(buildContext), body: ChatBody());
+    return Scaffold(appBar: chatAppBar(buildContext), body: const ChatBody());
   }
 }

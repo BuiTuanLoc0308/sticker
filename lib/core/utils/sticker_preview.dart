@@ -4,10 +4,10 @@ import 'package:my_stickers/data/models/sticker.dart';
 OverlayEntry? _previewOverlay;
 
 void showStickerPreview(BuildContext context, Sticker sticker) {
-  final screenSize = MediaQuery.of(context).size.width;
+  final double screenSize = MediaQuery.of(context).size.width;
 
   _previewOverlay = OverlayEntry(
-    builder: (overlayEntryContext) {
+    builder: (BuildContext overlayEntryContext) {
       // Chiếm toàn bộ màn hình với Positioned.fill
       return Positioned.fill(
         child: Container(
