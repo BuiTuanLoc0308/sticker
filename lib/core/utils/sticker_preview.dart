@@ -4,6 +4,8 @@ import 'package:my_stickers/data/models/sticker.dart';
 OverlayEntry? _previewOverlay;
 
 void showStickerPreview(BuildContext context, Sticker sticker) {
+  final screenSize = MediaQuery.of(context).size.width;
+
   _previewOverlay = OverlayEntry(
     builder: (overlayEntryContext) {
       // Chiếm toàn bộ màn hình với Positioned.fill
@@ -14,8 +16,8 @@ void showStickerPreview(BuildContext context, Sticker sticker) {
           alignment: Alignment.center,
           child: Image.asset(
             sticker.path,
-            width: MediaQuery.of(overlayEntryContext).size.width * 0.7,
-            height: MediaQuery.of(overlayEntryContext).size.width * 0.7,
+            width: screenSize * 0.7,
+            height: screenSize * 0.7,
           ),
         ),
       );

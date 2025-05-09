@@ -2,9 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:sticker_app/core/utils/media_picker.dart';
-import 'package:http/http.dart' as http;
 import 'package:sticker_app/features/sticker/widgets/sticker_remove_bg.dart';
-import 'package:sticker_app/services/remove_bg_service.dart';
 
 Future<T?> customStickerUploader<T>({required BuildContext context}) async {
   FocusScope.of(context).unfocus();
@@ -78,11 +76,6 @@ Future<T?> customStickerUploader<T>({required BuildContext context}) async {
                                   return GestureDetector(
                                     onTap: () async {
                                       imageOverlay(context, snapshot.data!);
-                                      // final originalFile = snapshot.data!;
-                                      // final bgRemoved =
-                                      //     await RemoveBgService.removeBackground(
-                                      //       snapshot.data!,
-                                      //     );
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(
