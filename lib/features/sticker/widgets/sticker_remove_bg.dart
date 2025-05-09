@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:sticker_app/services/remove_bg_service.dart';
+import 'package:sticker_app/services/remove_bg.dart';
 
 OverlayEntry? _imgOverlay;
 
@@ -59,6 +59,7 @@ void imageOverlay(BuildContext context, File imageFile) {
                           onPressed: () async {
                             if (isCutDone) {
                               // hideImage();
+                              // Thêm vào nhóm sticker mong muốn
                             } else {
                               setState(() {
                                 isLoading = true;
@@ -77,11 +78,13 @@ void imageOverlay(BuildContext context, File imageFile) {
                                   displayedImage = removedBg;
                                 });
                               } else {
-                                setState(() {
-                                  isLoading = false;
-                                  debugPrint('Fail to cut');
-                                });
-                                Navigator.pop(context);
+                                if (context.mounted) {
+                                  setState(() {
+                                    isLoading = false;
+                                    debugPrint('Fail to cut');
+                                  });
+                                  Navigator.pop(context);
+                                }
                               }
                             }
                           },
